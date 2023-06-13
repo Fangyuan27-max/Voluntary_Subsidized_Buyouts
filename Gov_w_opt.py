@@ -1,8 +1,3 @@
-import pandas as pd
-import numpy as np
-import Class_Gov
-import Class_Res
-
 def Run_W_Optimization(government, resList, calLength):
     # the subsidy needed to motivate relocation every year is calculated when creating residents
     # for each resident, government will select the year in which the NPV of past loss and subsidy is minimal
@@ -15,7 +10,9 @@ def Run_W_Optimization(government, resList, calLength):
             for year in range(calLength):
                 NPVsum.append(government.pastloss[res.idx][year] + res.Subsidyneeded[year]/(1+government.disRate)**year)
             government.NPVlossSubsidy[res.idx] = NPVsum
-            government.Subsidyyear[res.idx] = government.NPVlossSubsidy[res.idx].index(min(government.NPVlossSubsidy[res.idx]))
+            res.optmotiMoveYear = government.NPVlossSubsidy[res.idx].index(min(government.NPVlossSubsidy[res.idx]))
+            government.Subsidyyear[res.idx] = res.optmotiMoveYear
+
 
     elif government.disMethod == 'Hyperbolic':
         for res in resList:
@@ -23,11 +20,20 @@ def Run_W_Optimization(government, resList, calLength):
             for year in range(calLength):
                 NPVsum.append(government.pastloss[res.idx][year] + res.Subsidyneeded[year] / (1 + government.alpha * year))
             government.NPVlossSubsidy[res.idx] = NPVsum
-            government.Subsidyyear[res.idx] = government.NPVlossSubsidy[res.idx].index(min(government.NPVlossSubsidy[res.idx]))
+            res.optmotiMoveYear = government.NPVlossSubsidy[res.idx].index(min(government.NPVlossSubsidy[res.idx]))
+            government.Subsidyyear[res.idx] = res.optmotiMoveYear
     else:
         print("The discounting method should be either Exponential or Hyperbolic")
 
     return government
+
+
+
+
+
+
+
+
 
 
 

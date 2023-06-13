@@ -1,9 +1,10 @@
 class government:
-
     def __init__(self, disMethod, disRate, alpha):
         self.disMethod = disMethod
         self.disRate = disRate
         self.alpha = alpha
+
+        self.subPercent = 0.5
 
         # record the past loss for each resident at each year
         self.pastloss = {}
@@ -13,6 +14,7 @@ class government:
         # lists to record the number of relocation each year
         self.selfRelocationNum = []
         self.motiRelocationNum = []
+        self.optMotiRelocationNum = []
         # lists to record the subsidy cost and total buyout each year
         self.subsidycost = []
         self.totalcost = []
@@ -34,22 +36,14 @@ class government:
                     print("Please enter a valid discounting method!")
                 self.pastloss[resident.idx][i] = discountedLoss
 
-    def relocation_num_year(self, resList, calLength):
-        for i in range(calLength):
-            count_self = 0
-            count_moti = 0
-            for res in resList:
-                if res.selfMoveYear == i:
-                    count_self += 1
-                else:
-                    count_self += 0
 
-                if res.motiMoveYear == i:
-                    count_moti += 1
-                else:
-                    count_moti += 0
-            self.selfRelocationNum.append(count_self)
-            self.motiRelocationNum.append(count_moti)
+
+
+
+
+
+
+
 
 
 

@@ -1,10 +1,7 @@
-import pandas as pd
-import numpy as np
 import Class_Gov
-import Class_Res
 import copy
 
-def ResRun_WO_Optimization(resList, relocationcost, subPercent, calLength):
+def ResRun_WO_Optimization(resList, subPercent, calLength):
     for res in resList:
         for year in range(calLength):
             # check if the resident has moved out
@@ -29,6 +26,14 @@ def WO_optimization_Tuning(disMethod, disRate, govAlpha, calLength, resList,relc
             resListcopy = copy.deepcopy(resList)
             resListcopy = ResRun_WO_Optimization(resListcopy, relocationcost, percent, calLength)
             Gov.relocation_num_year(resListcopy, calLength)
+
+
+
+
+
+
+
+
 
 
 

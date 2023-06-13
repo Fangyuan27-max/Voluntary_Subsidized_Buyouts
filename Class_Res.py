@@ -41,12 +41,14 @@ class resident: #around 44 residents in total
 
         self.selfMoveYear = 200
         self.motiMoveYear = 150
+        self.optmotiMoveYear = 100
+
         self.selfMoveFlag = False
         self.motiMoveFlag = False
+
         self.freeRiderFlag = False
 
         self.movedOutFlag = False
-        self.notAffected = False
 
         self.FutureLoss = []
         self.Subsidyneeded = []
@@ -63,7 +65,9 @@ class resident: #around 44 residents in total
             else:
                 print("Please enter a valid discounting method!")
             self.FutureLoss.append(expectedLoss)
-            self.Subsidyneeded.append(max(0, self.relocationcost+self.replacementcost-expectedLoss))
+
+            self.Subsidyneeded.append(max(0, (self.relocationcost + self.replacementcost - expectedLoss)))
+
 
 
 

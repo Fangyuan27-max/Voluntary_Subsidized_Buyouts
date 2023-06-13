@@ -1,30 +1,54 @@
 import time
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import Class_Gov, Class_Res
 from Objects_Creater_Res import CreateRes
-from Gov_wo_opt import ResRun_WO_Optimization, WO_optimization_Tuning
+from Gov_wo_opt import ResRun_WO_Optimization
 from Gov_w_opt import Run_W_Optimization
+from Result_Analysis_Functions import relocation_num_year, adoption_rate_year, benefit_cost, subsidy_count_year
 
 if __name__ == '__main__':
     # create residents
-    resident_info = pd.read_csv("Res_info.csv")
-    ead_info = pd.read_csv('ead_list.csv')
-    ead_info = ead_info.drop(columns = ['landscape_scenario_id'])
+    # structure_id = pd.read_csv('structure_id.csv')
+    # resident_info = pd.read_csv("cost_replacement_relocation.csv")
+    # resident_info.drop_duplicates(keep='first', inplace=True)
+    # ead_info = pd.read_csv('EAD_g500_interpolated.csv')
+    # ead_info = ead_info.drop(columns=['landscape_scenario_id'])
+    # ead_info = ead_info.drop_duplicates('structure_id')
     colname = 'structure_id'
+    #
+    # #    print(structure_id.shape)
+    # #    print(resident_info.shape)
+    # #    print(ead_info.shape)
+    #
+    # merged_df = structure_id.merge(resident_info, on='structure_id', how='inner')
+    # #    print(merged_df.shape)
+    # #    print(merged_df.columns)
+    # merged_df1 = merged_df.merge(ead_info, on='structure_id', how='inner', validate='1:1')
+    # #    print(merged_df1.shape)
+    #
+    # resident_info = merged_df1[['structure_id', 'replacement_cost', 'relocation_cost']]
+    # ead_info = merged_df1.drop(['replacement_cost', 'relocation_cost'], axis=1)
+    # #    print(ead_info.columns)
+
+    ## The sample information
+    resident_info = pd.read_csv('sample_resident.csv')
+    ead_info = pd.read_csv('sample_eadlist.csv')
 
     disMethod = 'Exponential'
-    resDisRate = 0.18
+    resDisRate = 0.12
     resAlpha = 0.05
     calLength = 51
     relocationcost = 5
 
+    print("Start simulation")
     starttime1 = time.time()
     resList = CreateRes(resident_info, ead_info, colname, disMethod, resDisRate, resAlpha, calLength)
     endtime1 = time.time()
     print("Time used to create the resident list,", endtime1 - starttime1)
 
-    #create government
+    # create government
     disMethodGov = 'Exponential'
     disRateGov = 0.05
     disAlphaGov = 0.1
@@ -33,21 +57,30 @@ if __name__ == '__main__':
     # run a sample model without optimization
     subPercent = 0.5
     starttime2 = time.time()
-    resList = ResRun_WO_Optimization(resList, relocationcost, subPercent, calLength)
+    resList = ResRun_WO_Optimization(resList, subPercent, calLength)
     endtime2 = time.time()
-    print("Time used to create the resident list,", endtime2 - starttime2)
-
-    # display the result of the run without optimization
-    # Gov1.relocation_num_year(resList, calLength)
-    # print(Gov1.selfRelocationNum)
-    # print(Gov1.motiRelocationNum)
+    print("Time used to run simulation without optimization,", endtime2 - starttime2)
 
     # run with optimization
     starttime3 = time.time()
     Gov2 = Class_Gov.government(disMethodGov, disRateGov, disAlphaGov)
     government = Run_W_Optimization(Gov2, resList, calLength)
     endtime3 = time.time()
-    print("Time used to create the resident list,", endtime3 - starttime3)
+    print("Time used to run simulation optimization,", endtime3 - starttime3)
+
+    relocation_num_year(Gov2, resList, calLength)
+
+    print(Gov2.selfRelocationNum)
+    print(Gov2.motiRelocationNum)
+    print(Gov2.optMotiRelocationNum)
+
+    # table = adoption_rate_year(Gov2, calLength)
+    # print(table)
+    # result = subsidy_count_year(Gov2, resList, calLength)
+    # print(result)
+    benefit_cost_result = benefit_cost(Gov2, resList, calLength)
+    print(benefit_cost_result)
+    # print(result)
     # print(Gov2.Subsidyyear) # results show that all three residents in the experiment relocate in year o with subsidy support from the government
 
     # # check the amount of subsidy offered
