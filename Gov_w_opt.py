@@ -10,7 +10,7 @@ def Run_W_Optimization(government, resList, calLength):
             for year in range(calLength):
                 NPVsum.append(government.pastloss[res.idx][year] + res.Subsidyneeded[year]/(1+government.disRate)**year)
             government.NPVlossSubsidy[res.idx] = NPVsum
-            res.optmotiMoveYear = government.NPVlossSubsidy[res.idx].index(min(government.NPVlossSubsidy[res.idx]))
+            res.optmotiMoveYear = NPVsum.index(min(NPVsum))
             government.Subsidyyear[res.idx] = res.optmotiMoveYear
 
 

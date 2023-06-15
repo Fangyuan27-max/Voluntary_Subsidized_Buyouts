@@ -17,6 +17,7 @@ if __name__ == '__main__':
     # ead_info = ead_info.drop(columns=['landscape_scenario_id'])
     # ead_info = ead_info.drop_duplicates('structure_id')
     colname = 'structure_id'
+    startcol = 3
     #
     # #    print(structure_id.shape)
     # #    print(resident_info.shape)
@@ -44,7 +45,7 @@ if __name__ == '__main__':
 
     print("Start simulation")
     starttime1 = time.time()
-    resList = CreateRes(resident_info, ead_info, colname, disMethod, resDisRate, resAlpha, calLength)
+    resList = CreateRes(resident_info, ead_info, colname, startcol, disMethod, resDisRate, resAlpha, calLength)
     endtime1 = time.time()
     print("Time used to create the resident list,", endtime1 - starttime1)
 
@@ -74,12 +75,16 @@ if __name__ == '__main__':
     print(Gov2.motiRelocationNum)
     print(Gov2.optMotiRelocationNum)
 
+    for res in resList:
+        print('id:', res.idx, "self_move:", res.selfMoveYear, "moti_move:", res.motiMoveYear, "opt_moti_move:", res.optmotiMoveYear)
+
     # table = adoption_rate_year(Gov2, calLength)
     # print(table)
     # result = subsidy_count_year(Gov2, resList, calLength)
     # print(result)
     benefit_cost_result = benefit_cost(Gov2, resList, calLength)
-    print(benefit_cost_result)
+    # print(benefit_cost_result)
+    benefit_cost_result.to_csv('benefit_cost_result.csv')
     # print(result)
     # print(Gov2.Subsidyyear) # results show that all three residents in the experiment relocate in year o with subsidy support from the government
 
