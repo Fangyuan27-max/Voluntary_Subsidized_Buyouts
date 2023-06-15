@@ -74,8 +74,8 @@ def benefit_cost(gov, resList, calLength):
             else:
                 Moti_EAD += 0
             if i == res.motiMoveYear:
-                Moti_Subsidy += res.replacementcost * gov.subPercent
-                Moti_TC += res.replacementcost * gov.subPercent + res.replacementcost
+                Moti_Subsidy += res.replacementcost * gov.subPercent * (1 + res.inflaRate) ** i
+                Moti_TC += res.replacementcost * gov.subPercent * (1 + res.inflaRate) ** i + res.replacementcost * (1 + res.inflaRate) ** i
             ## calculate the benefit and cost of individually optimized subsidized relocation
             if i < res.optmotiMoveYear:
                 Opt_Moti_EAD += res.ead[i]
@@ -83,7 +83,7 @@ def benefit_cost(gov, resList, calLength):
                 Opt_Moti_EAD += 0
             if i == res.optmotiMoveYear:
                 Opt_Moti_Subsidy += res.Subsidyneeded[i]
-                Opt_Moti_TC += res.Subsidyneeded[i] + res.replacementcost
+                Opt_Moti_TC += res.Subsidyneeded[i] + res.replacementcost * (1 + res.inflaRate) ** i
         benefit_cost_year['Self_EAD'].append(Self_EAD)
         benefit_cost_year['Self_Subsidy'].append(Self_Subsidy)
         benefit_cost_year['Self_TC'].append(Self_TC)

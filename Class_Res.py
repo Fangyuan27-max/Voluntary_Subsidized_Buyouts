@@ -30,7 +30,7 @@ class resident: #around 44 residents in total
     #     self.Subsidyneeded = []
 
     ## This version will only contain necessary information
-    def __init__(self, idx, replacementcost, relocationcost, eadlist, disMethod, disRate, alpha):
+    def __init__(self, idx, replacementcost, relocationcost, eadlist, disMethod, disRate, alpha, inflaRate):
         self.idx = idx
         self.replacementcost = replacementcost
         self.relocationcost = relocationcost
@@ -38,6 +38,7 @@ class resident: #around 44 residents in total
         self.disMethod = disMethod
         self.disRate = disRate
         self.alpha = alpha
+        self.inflaRate = inflaRate
 
         self.selfMoveYear = 200
         self.motiMoveYear = 150
@@ -66,7 +67,7 @@ class resident: #around 44 residents in total
                 print("Please enter a valid discounting method!")
             self.FutureLoss.append(expectedLoss)
 
-            self.Subsidyneeded.append(max(0, (self.relocationcost + self.replacementcost - expectedLoss)))
+            self.Subsidyneeded.append(max(0, (self.relocationcost*(1 + self.inflaRate) ** i + self.replacementcost * (1 + self.inflaRate) ** i - expectedLoss)))
 
 
 

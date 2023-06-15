@@ -40,12 +40,13 @@ if __name__ == '__main__':
     disMethod = 'Exponential'
     resDisRate = 0.12
     resAlpha = 0.05
+    resInflaRate = 0.02
     calLength = 51
     relocationcost = 5
 
     print("Start simulation")
     starttime1 = time.time()
-    resList = CreateRes(resident_info, ead_info, colname, startcol, disMethod, resDisRate, resAlpha, calLength)
+    resList = CreateRes(resident_info, ead_info, colname, startcol, disMethod, resDisRate, resAlpha, resInflaRate, calLength)
     endtime1 = time.time()
     print("Time used to create the resident list,", endtime1 - starttime1)
 

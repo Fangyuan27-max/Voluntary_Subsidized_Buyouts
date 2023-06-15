@@ -1,6 +1,6 @@
 import Class_Res
 
-def CreateRes(resident_info, ead_info, colname, startcol,  disMethod, disRate, alpha, calLength):
+def CreateRes(resident_info, ead_info, colname, startcol,  disMethod, disRate, alpha, inflaRate, calLength):
     # Instantiate residents
     res_list = []
     for index, res in resident_info.iterrows():
@@ -9,7 +9,10 @@ def CreateRes(resident_info, ead_info, colname, startcol,  disMethod, disRate, a
 
         eadlist = ead_info.loc[ead_info[colname] == res[colname]].values.tolist()[0][startcol:]
 
-        resident = Class_Res.resident(res[colname], round(res['replacement_cost'],1), round(res['relocation_cost'],1), eadlist, disMethod, disRate, alpha)
+        replacement_cost = int(res['replacement_cost'])
+        relocation_cost = int(res['relocation_cost'])
+
+        resident = Class_Res.resident(res[colname], replacement_cost, relocation_cost, eadlist, disMethod, disRate, alpha, inflaRate)
         resident.expectedFutureLoss(calLength)
 
         # calculate the expected future loss and determine when to relocate for every resident
