@@ -72,26 +72,26 @@ def benefit_cost(gov, resList, calLength):
         for res in resList:
             ## calculate the benefit and cost of self-move
             if i < res.selfMoveYear:
-                Self_EAD += res.ead[i]
+                Self_EAD += res.ead[i]/((1 + gov.disRate) ** i)
             else:
                 Self_EAD += 0
             # since under the self-move mode, the government will not provide any subsidy but bear the flood loss, the subsidy and totalcost will be 0
             ## calculate the benefit and cost of fixed-subsidy percentage relocation
             if i < res.motiMoveYear:
-                Moti_EAD += res.ead[i]
+                Moti_EAD += res.ead[i]/((1 + gov.disRate) ** i)
             else:
                 Moti_EAD += 0
             if i == res.motiMoveYear:
-                Moti_Subsidy += res.replacementcost * gov.subPercent * (1 + res.inflaRate) ** i
-                Moti_TC += res.replacementcost * gov.subPercent * (1 + res.inflaRate) ** i + res.replacementcost * (1 + res.inflaRate) ** i
+                Moti_Subsidy += res.replacementcost * gov.subPercent * (1 + res.inflaRate) ** i/((1 + gov.disRate) ** i)
+                Moti_TC += (res.replacementcost * gov.subPercent * (1 + res.inflaRate) ** i + res.replacementcost * (1 + res.inflaRate) ** i)/((1 + gov.disRate) ** i)
             ## calculate the benefit and cost of individually optimized subsidized relocation
             if i < res.optmotiMoveYear:
-                Opt_Moti_EAD += res.ead[i]
+                Opt_Moti_EAD += res.ead[i]/((1 + gov.disRate) ** i)
             else:
                 Opt_Moti_EAD += 0
             if i == res.optmotiMoveYear:
-                Opt_Moti_Subsidy += res.Subsidyneeded[i]
-                Opt_Moti_TC += res.Subsidyneeded[i] + res.replacementcost * (1 + res.inflaRate) ** i
+                Opt_Moti_Subsidy += res.Subsidyneeded[i]/((1 + res.disRate) ** i)
+                Opt_Moti_TC += (res.Subsidyneeded[i] + res.replacementcost * (1 + res.inflaRate) ** i)/((1 + gov.disRate) ** i)
         benefit_cost_year['Self_EAD'].append(Self_EAD)
         benefit_cost_year['Self_Subsidy'].append(Self_Subsidy)
         benefit_cost_year['Self_TC'].append(Self_TC)

@@ -49,7 +49,7 @@ class government:
 
             if res.motiMoveYear < calLength:
                 self.objective_fixed_subsidy += self.pastloss[res.idx][res.motiMoveYear] + subPercent * res.replacementcost * (1 + res.inflaRate) ** res.motiMoveYear/((1 + self.disRate)**res.motiMoveYear)
-                self.obj_fixed_subsidy_replacement = self.pastloss[res.idx][res.motiMoveYear] + (1 + subPercent) * res.replacementcost * (1 + res.inflaRate) ** res.motiMoveYear/((1 + self.disRate)**res.motiMoveYear)
+                self.obj_fixed_subsidy_replacement += self.pastloss[res.idx][res.motiMoveYear] + (1 + subPercent) * res.replacementcost * (1 + res.inflaRate) ** res.motiMoveYear/((1 + self.disRate)**res.motiMoveYear)
             else:
                 self.objective_fixed_subsidy += self.pastloss[res.idx][calLength - 1]
                 self.obj_fixed_subsidy_replacement += self.pastloss[res.idx][calLength - 1]
