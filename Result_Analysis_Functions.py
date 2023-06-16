@@ -1,13 +1,13 @@
-import time
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import Class_Gov, Class_Res
-from Objects_Creater_Res import CreateRes
-from Gov_wo_opt import ResRun_WO_Optimization, WO_optimization_Tuning
-from Gov_w_opt import Run_W_Optimization
+
 def relocation_num_year(gov, resList, calLength):
+    relocation_num = {}
+    relocation_num['Year'] = []
+    relocation_num['Self_relocation'] = []
+    relocation_num['Moti_relocation'] = []
+    relocation_num['Opt_moti_relocation'] = []
     for i in range(calLength):
+        relocation_num[i] = {}
         count_self = 0
         count_moti = 0
         count_opt_moti = 0
@@ -30,6 +30,14 @@ def relocation_num_year(gov, resList, calLength):
         gov.selfRelocationNum.append(count_self)
         gov.motiRelocationNum.append(count_moti)
         gov.optMotiRelocationNum.append(count_opt_moti)
+
+        relocation_num['Year'].append(i)
+        relocation_num['Self_relocation'].append(count_self)
+        relocation_num['Moti_relocation'].append(count_moti)
+        relocation_num['Opt_moti_relocation'].append(count_opt_moti)
+    relocation_num = pd.DataFrame(relocation_num, columns = ['Year','Self_relocation', 'Moti_relocation','Opt_moti_relocation'])
+    return relocation_num
+
 def adoption_rate_year(gov, calLength):
     adoption_rate = {}
     adoption_rate["Year"] = []

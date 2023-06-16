@@ -15,12 +15,16 @@ class government:
         self.selfRelocationNum = []
         self.motiRelocationNum = []
         self.optMotiRelocationNum = []
-        # lists to record the subsidy cost and total buyout each year
-        self.subsidycost = []
-        self.totalcost = []
 
-        self.totalobjective = []
+        # lists to record the objective of three different mode
+        self.objective_wo_subsidy = 0
+        self.objective_fixed_subsidy = 0
+        self.obj_fixed_subsidy_replacement = 0
 
+        self.objective_optimize_individually = 0
+        self.obj_optimal_subsidy_replacement = 0
+
+    # A function to calculate the discounted
     def discountedPastLoss(self, residents, calLength):
         for resident in residents:
             self.pastloss[resident.idx] = {}
@@ -36,12 +40,28 @@ class government:
                     print("Please enter a valid discounting method!")
                 self.pastloss[resident.idx][i] = discountedLoss
 
+    def calculating_objective_WO_optimization(self, subPercent, residents, calLength):
+        for res in residents:
+            if res.selfMoveYear < calLength:
+                self.objective_wo_subsidy += self.pastloss[res.idx][res.selfMoveYear]
+            else:
+                self.objective_wo_subsidy += self.pastloss[res.idx][calLength - 1]
 
+            if res.motiMoveYear < calLength:
+                self.objective_fixed_subsidy += self.pastloss[res.idx][res.motiMoveYear] + subPercent * res.replacementcost * (1 + res.inflaRate) ** res.motiMoveYear/((1 + self.disRate)**res.motiMoveYear)
+                self.obj_fixed_subsidy_replacement = self.pastloss[res.idx][res.motiMoveYear] + (1 + subPercent) * res.replacementcost * (1 + res.inflaRate) ** res.motiMoveYear/((1 + self.disRate)**res.motiMoveYear)
+            else:
+                self.objective_fixed_subsidy += self.pastloss[res.idx][calLength - 1]
+                self.obj_fixed_subsidy_replacement += self.pastloss[res.idx][calLength - 1]
 
-
-
-
-
+    def calculating_objective_W_optimization(self, residents, calLength):
+        for res in residents:
+            if res.optmotiMoveYear < calLength:
+                self.objective_optimize_individually += self.pastloss[res.idx][res.optmotiMoveYear] + res.Subsidyneeded[res.optmotiMoveYear]/((1 + self.disRate) ** res.optmotiMoveYear)
+                self.obj_optimal_subsidy_replacement += self.pastloss[res.idx][res.optmotiMoveYear] + res.Subsidyneeded[res.optmotiMoveYear]/((1 + self.disRate) ** res.optmotiMoveYear) + res.replacementcost * (1 + res.inflaRate) ** res.motiMoveYear/((1 + self.disRate)**res.motiMoveYear)
+            else:
+                self.objective_optimize_individually += self.pastloss[res.idx][calLength - 1]
+                self.obj_optimal_subsidy_replacement += self.pastloss[res.idx][calLength - 1]
 
 
 

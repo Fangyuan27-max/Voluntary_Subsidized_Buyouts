@@ -2,7 +2,6 @@ def Run_W_Optimization(government, resList, calLength):
     # the subsidy needed to motivate relocation every year is calculated when creating residents
     # for each resident, government will select the year in which the NPV of past loss and subsidy is minimal
     # the first step is to calculate the past loss for government
-    government.discountedPastLoss(resList, calLength)
 
     if government.disMethod == "Exponential":
         for res in resList:
@@ -36,6 +35,7 @@ def Run_W_Optimization(government, resList, calLength):
     else:
         print("The discounting method should be either Exponential or Hyperbolic")
 
+    government.calculating_objective_W_optimization(resList, calLength)
     return government
 
 
