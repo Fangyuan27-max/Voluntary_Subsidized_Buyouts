@@ -38,7 +38,8 @@ def relocation_num_year(gov, resList, calLength):
     relocation_num = pd.DataFrame(relocation_num, columns = ['Year','Self_relocation', 'Moti_relocation','Opt_moti_relocation'])
     return relocation_num
 
-def adoption_rate_year(gov, calLength):
+def adoption_rate_year(gov, resList, calLength):
+    resnum = len(resList)
     adoption_rate = {}
     adoption_rate["Year"] = []
     adoption_rate['Self_Move_Adopt'] = []
@@ -46,9 +47,9 @@ def adoption_rate_year(gov, calLength):
     adoption_rate['Opt_Subsidy_Move_Adopt'] = []
     for i in range(calLength):
         adoption_rate['Year'].append(i)
-        adoption_rate['Self_Move_Adopt'].append(sum(gov.selfRelocationNum[:i])/len(gov.selfRelocationNum))
-        adoption_rate['Fixmoti_Move_Adopt'].append(sum(gov.motiRelocationNum[:i])/len(gov.motiRelocationNum))
-        adoption_rate['Opt_Subsidy_Move_Adopt'].append(sum(gov.optMotiRelocationNum[:i]) / len(gov.optMotiRelocationNum))
+        adoption_rate['Self_Move_Adopt'].append(sum(gov.selfRelocationNum[:i])/resnum)
+        adoption_rate['Fixmoti_Move_Adopt'].append(sum(gov.motiRelocationNum[:i])/resnum)
+        adoption_rate['Opt_Subsidy_Move_Adopt'].append(sum(gov.optMotiRelocationNum[:i]) /resnum)
     adoption_rate_table = pd.DataFrame(adoption_rate)
     return adoption_rate_table
 

@@ -81,7 +81,7 @@ if __name__ == '__main__':
     relocation_num.to_csv("Relocation_num_each_year.csv")
 
     # The relocation adoption rate of the three modes
-    adoption_rate = adoption_rate_year(Gov, calLength)
+    adoption_rate = adoption_rate_year(Gov, resList, calLength)
     adoption_rate.to_csv("Adoption_rate.csv")
 
     # The EAD occured, subsidy needed, and the total cost (subsidy + replacement cost) each year of the three modes
