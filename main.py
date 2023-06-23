@@ -25,13 +25,12 @@ if __name__ == '__main__':
     # merging the structure data and ead data together and obtain the inputs for later functions (creating residents)
     merged_df = resident_info.merge(ead_info, on='structure_id', how='inner', validate = '1:1')
 
-    print("The size of the ")
     resident_info = merged_df[['structure_id', 'replacement_cost', 'relocation_cost']]
     ead_info = merged_df.drop(['replacement_cost', 'relocation_cost'], axis=1)
 
     # Define the key of ead_info, and from which column the ead starts
     colname = 'structure_id'
-    startcol = 3
+    startcol = 1
 
     ## The sample information
     # resident_info = pd.read_csv('sample_resident.csv')
@@ -57,11 +56,12 @@ if __name__ == '__main__':
     print("Time used to create the resident list,", endtime1 - starttime1)
 
     # select the percentage for fixed subsidy without optimization, given that we are not able to judge the
-    perlist = list(np.arange(0.1, 0.5, 0.01))
-    result, selected_per = selecting_percentage(perlist, resList, calLength, disMethodGov, disRateGov, disAlphaGov)
-    print("The selected fixed percentage:", selected_per)
+    # perlist = list(np.arange(0.1, 0.51, 0.01))
+    # result, selected_per = selecting_percentage(perlist, resList, calLength, disMethodGov, disRateGov, disAlphaGov)
+    # print("The selected fixed percentage:", selected_per)
 
     # simualtion for 1 and 2
+    selected_per = 0.49 # the final selected percentage
     subPercent = selected_per
     Gov = Class_Gov.government(disMethodGov, disRateGov, disAlphaGov)
     starttime2 = time.time()

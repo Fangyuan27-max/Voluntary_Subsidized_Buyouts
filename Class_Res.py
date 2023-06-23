@@ -67,7 +67,7 @@ class resident: #around 44 residents in total
                 print("Please enter a valid discounting method!")
             self.FutureLoss.append(expectedLoss)
 
-            self.Subsidyneeded.append(max(0, (self.relocationcost*(1 + self.inflaRate) ** i + self.replacementcost * (1 + self.inflaRate) ** i - expectedLoss)))
+            self.Subsidyneeded.append(max(0, (self.relocationcost + self.replacementcost - expectedLoss)))
 
 
 

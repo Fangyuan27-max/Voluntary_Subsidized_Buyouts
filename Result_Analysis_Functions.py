@@ -49,7 +49,7 @@ def adoption_rate_year(gov, resList, calLength):
         adoption_rate['Year'].append(i)
         adoption_rate['Self_Move_Adopt'].append(sum(gov.selfRelocationNum[:i])/resnum)
         adoption_rate['Fixmoti_Move_Adopt'].append(sum(gov.motiRelocationNum[:i])/resnum)
-        adoption_rate['Opt_Subsidy_Move_Adopt'].append(sum(gov.optMotiRelocationNum[:i]) /resnum)
+        adoption_rate['Opt_Subsidy_Move_Adopt'].append(sum(gov.optMotiRelocationNum[:i])/resnum)
     adoption_rate_table = pd.DataFrame(adoption_rate)
     return adoption_rate_table
 
@@ -83,8 +83,8 @@ def benefit_cost(gov, resList, calLength):
             else:
                 Moti_EAD += 0
             if i == res.motiMoveYear:
-                Moti_Subsidy += res.replacementcost * gov.subPercent * (1 + res.inflaRate) ** i/((1 + gov.disRate) ** i)
-                Moti_TC += (res.replacementcost * gov.subPercent * (1 + res.inflaRate) ** i + res.replacementcost * (1 + res.inflaRate) ** i)/((1 + gov.disRate) ** i)
+                Moti_Subsidy += res.replacementcost * gov.subPercent/((1 + gov.disRate) ** i)
+                Moti_TC += (res.replacementcost * gov.subPercent + res.replacementcost)/((1 + gov.disRate) ** i)
             ## calculate the benefit and cost of individually optimized subsidized relocation
             if i < res.optmotiMoveYear:
                 Opt_Moti_EAD += res.ead[i]/((1 + gov.disRate) ** i)
@@ -92,7 +92,7 @@ def benefit_cost(gov, resList, calLength):
                 Opt_Moti_EAD += 0
             if i == res.optmotiMoveYear:
                 Opt_Moti_Subsidy += res.Subsidyneeded[i]/((1 + res.disRate) ** i)
-                Opt_Moti_TC += (res.Subsidyneeded[i] + res.replacementcost * (1 + res.inflaRate) ** i)/((1 + gov.disRate) ** i)
+                Opt_Moti_TC += (res.Subsidyneeded[i] + res.replacementcost)/((1 + gov.disRate) ** i)
         benefit_cost_year['Self_EAD'].append(Self_EAD)
         benefit_cost_year['Self_Subsidy'].append(Self_Subsidy)
         benefit_cost_year['Self_TC'].append(Self_TC)

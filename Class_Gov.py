@@ -48,8 +48,8 @@ class government:
                 self.objective_wo_subsidy += self.pastloss[res.idx][calLength - 1]
 
             if res.motiMoveYear < calLength:
-                self.objective_fixed_subsidy += self.pastloss[res.idx][res.motiMoveYear] + subPercent * res.replacementcost * (1 + res.inflaRate) ** res.motiMoveYear/((1 + self.disRate)**res.motiMoveYear)
-                self.obj_fixed_subsidy_replacement += self.pastloss[res.idx][res.motiMoveYear] + (1 + subPercent) * res.replacementcost * (1 + res.inflaRate) ** res.motiMoveYear/((1 + self.disRate)**res.motiMoveYear)
+                self.objective_fixed_subsidy += self.pastloss[res.idx][res.motiMoveYear] + subPercent * res.replacementcost /((1 + self.disRate)**res.motiMoveYear)
+                self.obj_fixed_subsidy_replacement += self.pastloss[res.idx][res.motiMoveYear] + (1 + subPercent) * res.replacementcost /((1 + self.disRate)**res.motiMoveYear)
             else:
                 self.objective_fixed_subsidy += self.pastloss[res.idx][calLength - 1]
                 self.obj_fixed_subsidy_replacement += self.pastloss[res.idx][calLength - 1]
@@ -58,7 +58,7 @@ class government:
         for res in residents:
             if res.optmotiMoveYear < calLength:
                 self.objective_optimize_individually += self.pastloss[res.idx][res.optmotiMoveYear] + res.Subsidyneeded[res.optmotiMoveYear]/((1 + self.disRate) ** res.optmotiMoveYear)
-                self.obj_optimal_subsidy_replacement += self.pastloss[res.idx][res.optmotiMoveYear] + res.Subsidyneeded[res.optmotiMoveYear]/((1 + self.disRate) ** res.optmotiMoveYear) + res.replacementcost * (1 + res.inflaRate) ** res.motiMoveYear/((1 + self.disRate)**res.motiMoveYear)
+                self.obj_optimal_subsidy_replacement += self.pastloss[res.idx][res.optmotiMoveYear] + (res.Subsidyneeded[res.optmotiMoveYear] + res.replacementcost)/((1 + self.disRate) ** res.optmotiMoveYear)
             else:
                 self.objective_optimize_individually += self.pastloss[res.idx][calLength - 1]
                 self.obj_optimal_subsidy_replacement += self.pastloss[res.idx][calLength - 1]
