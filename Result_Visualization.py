@@ -3,16 +3,24 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 base_dir = './The result output/'
-num_file_path = 'Relocation_num_each_year.csv'
-adoption_rate_path = 'Adoption_rate.csv'
-bcr_path = 'benefit_cost_result.csv'
+num_file_path_30 = 'Relocation_num_each_year_30.csv'
+adoption_rate_path_30 = 'Adoption_rate_30.csv'
+bcr_path_30 = 'benefit_cost_result_30.csv'
 
-Relocation_num = pd.read_csv(base_dir + num_file_path)
-Adoption_rate = pd.read_csv(base_dir + adoption_rate_path)
-Benefit_cost = pd.read_csv(base_dir + bcr_path)
+Relocation_num_30 = pd.read_csv(base_dir + num_file_path_30)
+Adoption_rate_30 = pd.read_csv(base_dir + adoption_rate_path_30)
+Benefit_cost_30 = pd.read_csv(base_dir + bcr_path_30)
+
+num_file_path_50 = 'Relocation_num_each_year_50.csv'
+adoption_rate_path_50 = 'Adoption_rate_50.csv'
+bcr_path_50 = 'benefit_cost_result_50.csv'
+
+Relocation_num_50 = pd.read_csv(base_dir + num_file_path_50)
+Adoption_rate_50 = pd.read_csv(base_dir + adoption_rate_path_50)
+Benefit_cost_50 = pd.read_csv(base_dir + bcr_path_50)
 
 # A function to plot the bar chart of the number of relocation every year
-def Bar_relocation(Relocation_num):
+def Bar_relocation(Relocation_num, calLength):
     x = Relocation_num['Year']
     y1 = Relocation_num['Self_relocation']
     y2 = Relocation_num['Moti_relocation']
@@ -33,7 +41,7 @@ def Bar_relocation(Relocation_num):
 
     # aggregated the relocation number to a 5-year or 10-year time period
     time_interval = 5
-    x1 = list(np.arange(0, 55, time_interval))
+    x1 = list(np.arange(0, calLength + 5, time_interval))
     y1_agg = []
     y2_agg = []
     y3_agg = []
@@ -58,10 +66,11 @@ def Bar_relocation(Relocation_num):
     plt.xticks(x2)
     plt.show()
 
-Bar_relocation(Relocation_num)
+Bar_relocation(Relocation_num_30, 30)
+Bar_relocation(Relocation_num_50, 50)
 
 # A function to plot the stack line chart of the adoption rate
-def Line_adoption(Adoption):
+def Line_adoption(Adoption, calLength):
     x = Adoption['Year']
     y1 = Adoption['Self_Move_Adopt']
     y2 = Adoption['Fixmoti_Move_Adopt']
@@ -80,18 +89,18 @@ def Line_adoption(Adoption):
     plt.ylabel('The accumulated adoption rate')
     plt.title('The accumulative relocation rate under three relocation modes')
     plt.legend(loc = 'upper left')
-    x1 = np.arange(0, 55, 5)
+    x1 = np.arange(0, calLength+5, 5)
     plt.xticks(x1)
-    plt.xlim(0,50)
+    plt.xlim(0, calLength)
     plt.show()
 
-Line_adoption(Adoption_rate)
-
+Line_adoption(Adoption_rate_30, 30)
+Line_adoption(Adoption_rate_50, 50)
 
 # A function to plot the EAD(bar chart) and benefit/cost ratio(line chart) simultaneously
-def Bar_EAD_Line_BC(Benefit_cost):
+def Bar_EAD_Line_BC(Benefit_cost, calLength):
     x = Benefit_cost['Year']
-    x1 = np.arange(0, 55, 5)
+    x1 = np.arange(0, calLength+5, 5)
     x2 = x1[1:]
 
     self_EAD = []
@@ -135,7 +144,8 @@ def Bar_EAD_Line_BC(Benefit_cost):
 
     plt.title("EAD and Benefit/Cost every five years")
     plt.show()
-Bar_EAD_Line_BC(Benefit_cost)
+Bar_EAD_Line_BC(Benefit_cost_30, 30)
+Bar_EAD_Line_BC(Benefit_cost_50, 50)
 
 
 
