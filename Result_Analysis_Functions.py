@@ -106,20 +106,35 @@ def benefit_cost(gov, resList, calLength):
     return benefit_cost_result
 
 
-def subsidy_count_year(gov, resList, calLength):
-    count_avg_year = {}
-    count_avg_year['year'] = []
-    count_avg_year['count'] = []
-    count_avg_year['average'] = []
-    for i in range(calLength):
-        count = 0
-        subsidy_sum = 0
+def analysis_mhi(gov, resList, mhi_list, calLength):
+    mhi_result = {}
+    for mhi in mhi_list:
+        mhi_result[mhi] = {}
+        mhi_result[mhi]['Total_Relocation_Num'] = 0
+        mhi_result[mhi]['Total_Subsidy_Amount'] = 0
+        mhi_result[mhi]['Total_Cost'] = 0
+
+        mhi_result[mhi]['Relocation_Year'] = []
+        mhi_result[mhi]['Percent_Relocation'] = 0
+        mhi_result[mhi]['Avg_Subsidy_Amount'] = 0
+        mhi_result[mhi]['Avg_TC'] = 0
+
+    for mhi in mhi_list:
+        mhi_number = 0
         for res in resList:
-            if res.optmotiMoveYear == i:
-                count += 1
-                subsidy_sum += res.Subsidyneeded[i]
-        count_avg_year['year'].append(i)
-        count_avg_year['count'].append(count)
-        count_avg_year['average'].append(subsidy_sum / count if count != 0 else 0)
-    result = pd.DataFrame(count_avg_year)
-    return result
+            if res.mhi_ratio == mhi:
+                mhi_number += 1
+                if res.optimotiFlag == 1:
+                    mhi_result[mhi]['Total_Relocation_Num'] += 1
+                    mhi_result[mhi]['Total_Subsidy_Amount'] += res.Subsidyneeded[res.optmotiMoveYear]
+                    mhi_result[mhi]['Total_cost'] += res.Subsidyneeded[res.optmotiMoveYear] + res.replacementcost + res.relocationcost
+                    mhi_result[mhi]['Relocation_Year'].append(res.optmotiMoveYear)
+
+        mhi_result[mhi]['Percent_relocation'] = mhi_result[mhi]['Total_Relocation_Num']/(mhi_number+1)
+        mhi_result[mhi]['Avg_Subsidy_Amount'] = mhi_result[mhi]['Total_Subsidy_Amount']/mhi_result[mhi]['Total_Relocation_Num']
+        mhi_result[mhi]['Avg_TC'] = mhi_result[mhi]['Total_Cost']/mhi_result[mhi]['Total_Relocation_Num']
+
+    mhi_result_output = pd.DataFrame(mhi_result).T
+    return mhi_result_output
+
+

@@ -19,6 +19,9 @@ Relocation_num_50 = pd.read_csv(base_dir + num_file_path_50)
 Adoption_rate_50 = pd.read_csv(base_dir + adoption_rate_path_50)
 Benefit_cost_50 = pd.read_csv(base_dir + bcr_path_50)
 
+mhi_result_path = 'The result output/mhi_result.csv'
+mhi_result = pd.read_csv(base_dir + mhi_result_path)
+
 # A function to plot the bar chart of the number of relocation every year
 def Bar_relocation(Relocation_num, calLength):
     x = Relocation_num['Year']
@@ -66,8 +69,8 @@ def Bar_relocation(Relocation_num, calLength):
     plt.xticks(x2)
     plt.show()
 
-Bar_relocation(Relocation_num_30, 30)
-Bar_relocation(Relocation_num_50, 50)
+# Bar_relocation(Relocation_num_30, 30)
+# Bar_relocation(Relocation_num_50, 50)
 
 # A function to plot the stack line chart of the adoption rate
 def Line_adoption(Adoption, calLength):
@@ -94,8 +97,8 @@ def Line_adoption(Adoption, calLength):
     plt.xlim(0, calLength)
     plt.show()
 
-Line_adoption(Adoption_rate_30, 30)
-Line_adoption(Adoption_rate_50, 50)
+# Line_adoption(Adoption_rate_30, 30)
+# Line_adoption(Adoption_rate_50, 50)
 
 # A function to plot the EAD(bar chart) and benefit/cost ratio(line chart) simultaneously
 def Bar_EAD_Line_BC(Benefit_cost, calLength):
@@ -144,8 +147,47 @@ def Bar_EAD_Line_BC(Benefit_cost, calLength):
 
     plt.title("EAD and Benefit/Cost every five years")
     plt.show()
-Bar_EAD_Line_BC(Benefit_cost_30, 30)
-Bar_EAD_Line_BC(Benefit_cost_50, 50)
+# Bar_EAD_Line_BC(Benefit_cost_30, 30)
+# Bar_EAD_Line_BC(Benefit_cost_50, 50)
 
+# a function to display the variable vs mhi_ratio; the variable that can be used include
+#         mhi_result[mhi]['Total_Relocation_Num'] = 0
+#         mhi_result[mhi]['Total_Subsidy_Amount'] = 0
+#         mhi_result[mhi]['Total_Cost'] = 0
+#
+#         mhi_result[mhi]['Relocation_Year'] = []
+#         mhi_result[mhi]['Percent_Relocation'] = 0
+#         mhi_result[mhi]['Avg_Subsidy_Amount'] = 0
+#         mhi_result[mhi]['Avg_TC'] = 0
+def mhi_analysis_visualization(mhi_result, column_name):
+    mhi_list = list(mhi_result.iloc[:, 0])
+    print(mhi)
+    x = np.arange(1, len(mhi)+1, 1)
+    value = mhi_result[column_name]
 
+    plt.figure()
+    bar_width = 1/2
+    plt.bar(x, value, width=bar_width, color='#ECA8A9')
+
+    plt.xlabel('Mhi_Ratio')
+    plt.ylabel(column_name)
+    plt.title(column_name + ' VS MHI_Ratio')
+    plt.xticks(x, mhi_list)
+    plt.show()
+
+# mhi_analysis_visualization(mhi_result, 'Total_Relocation_Num')
+# mhi_analysis_visualization(mhi_result, 'Total_Subsidy_Amount')
+# mhi_analysis_visualization(mhi_result, 'Total_Cost')
+# mhi_analysis_visualization(mhi_result, 'Percent_Relocation')
+# mhi_analysis_visualization(mhi_result, 'Avg_Subsidy_Amount')
+# mhi_analysis_visualization(mhi_result, 'Avg_TC')
+
+def Relocation_year(mhi_result, colname, calLength):
+    mhi_list = list(mhi_result.iloc[:, 0])
+
+    for mhi in mhi_list:
+        relocation_year = list(mhi_result[mhi_result.iloc[:, 0] == mhi][colname])[0]
+
+        print(relocation_year)
+Relocation_year(mhi_result, 'Relocation_Year', 30)
 

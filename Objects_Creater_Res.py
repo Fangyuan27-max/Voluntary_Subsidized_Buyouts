@@ -12,7 +12,7 @@ def CreateRes(resident_info, ead_info, colname, startcol,  disMethod, disRate, a
         replacement_cost = int(res['replacement_cost'])
         relocation_cost = int(res['relocation_cost'])
 
-        resident = Class_Res.resident(res[colname], replacement_cost, relocation_cost, eadlist, disMethod, disRate, alpha, inflaRate)
+        resident = Class_Res.resident(res[colname], replacement_cost, relocation_cost, eadlist, disMethod, disRate, alpha, inflaRate, res['mhi_ratio'])
         resident.expectedFutureLoss(calLength)
 
         # calculate the expected future loss and determine when to relocate for every resident

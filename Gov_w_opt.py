@@ -15,6 +15,7 @@ def Run_W_Optimization(government, resList, calLength):
                 res.optmotiMoveYear = 100
             else:
                 res.optmotiMoveYear = moveYear_Optimize
+                res.optimotiFlag = 1
             government.Subsidyyear[res.idx] = res.optmotiMoveYear
 
 
@@ -30,6 +31,7 @@ def Run_W_Optimization(government, resList, calLength):
                 res.optmotiMoveYear = 100
             else:
                 res.optmotiMoveYear = moveYear_Optimize
+                res.optimotiFlag = 1
             government.Subsidyyear[res.idx] = res.optmotiMoveYear
 
     else:

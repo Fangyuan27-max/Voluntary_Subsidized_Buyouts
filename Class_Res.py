@@ -30,7 +30,7 @@ class resident: #around 44 residents in total
     #     self.Subsidyneeded = []
 
     ## This version will only contain necessary information
-    def __init__(self, idx, replacementcost, relocationcost, eadlist, disMethod, disRate, alpha, inflaRate):
+    def __init__(self, idx, replacementcost, relocationcost, eadlist, disMethod, disRate, alpha, inflaRate, mhi_ratio):
         self.idx = idx
         self.replacementcost = replacementcost
         self.relocationcost = relocationcost
@@ -39,6 +39,7 @@ class resident: #around 44 residents in total
         self.disRate = disRate
         self.alpha = alpha
         self.inflaRate = inflaRate
+        self.mhi_ratio = mhi_ratio
 
         self.selfMoveYear = 200
         self.motiMoveYear = 150
@@ -46,6 +47,7 @@ class resident: #around 44 residents in total
 
         self.selfMoveFlag = False
         self.motiMoveFlag = False
+        self.optimotiFlag = False
 
         self.freeRiderFlag = False
 
