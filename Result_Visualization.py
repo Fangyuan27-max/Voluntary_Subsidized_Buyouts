@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -101,7 +103,7 @@ def Line_adoption(Adoption, calLength):
 # Line_adoption(Adoption_rate_50, 50)
 
 # A function to plot the EAD(bar chart) and benefit/cost ratio(line chart) simultaneously
-def Bar_EAD_Line_BC(Benefit_cost, calLength):
+def Bar_EAD_Line_BC_WO_Discounting(Benefit_cost, calLength):
     x = Benefit_cost['Year']
     x1 = np.arange(0, calLength+5, 5)
     x2 = x1[1:]
@@ -137,6 +139,7 @@ def Bar_EAD_Line_BC(Benefit_cost, calLength):
     ax1.set_ylabel('EAD every five years')
     ax1.set_xlabel('Year')
     ax1.set_xticks(x2)
+    ax1.set_ylim(0, 8e9)
     ax1.legend(bbox_to_anchor=(0.60, 1.0), loc='upper right')
 
     ax2 = ax1.twinx()
@@ -147,8 +150,69 @@ def Bar_EAD_Line_BC(Benefit_cost, calLength):
 
     plt.title("EAD and Benefit/Cost every five years")
     plt.show()
-# Bar_EAD_Line_BC(Benefit_cost_30, 30)
-# Bar_EAD_Line_BC(Benefit_cost_50, 50)
+# Bar_EAD_Line_BC_WO_Discounting(Benefit_cost_30, 30)
+# Bar_EAD_Line_BC_WO_Discounting(Benefit_cost_50, 50)
+
+def discount_value(value, year, rate):
+    return value / (1 + rate) ** year
+def Bar_EAD_Line_BC_Discounting(Benefit_cost, DG, calLength):
+    # step 1: discounted to year 0
+    Benefit_cost = copy.deepcopy(Benefit_cost)
+    column_list = list(Benefit_cost.columns)[2:]
+    for column in column_list:
+        Benefit_cost[column] = Benefit_cost.apply(lambda row: discount_value(row[column], row['Year'], DG), axis=1)
+
+    x = Benefit_cost['Year']
+    x1 = np.arange(0, calLength+5, 5)
+    x2 = x1[1:]
+
+    self_EAD = []
+    fixmoti_EAD = []
+    optmoti_EAD = []
+
+    fixmoti_TC = []
+    optmoti_TC = []
+
+    # aggregate the flood loss, and total cost
+    for i in range(len(x1)-1):
+        self_EAD.append(Benefit_cost[(Benefit_cost['Year'] >= x1[i])&(Benefit_cost['Year'] < x1[i+1])]['Self_EAD'].sum())
+        fixmoti_EAD.append(Benefit_cost[(Benefit_cost['Year'] >= x1[i])&(Benefit_cost['Year'] < x1[i+1])]['Moti_EAD'].sum())
+        optmoti_EAD.append(Benefit_cost[(Benefit_cost['Year'] >= x1[i])&(Benefit_cost['Year'] < x1[i+1])]['Opt_Moti_EAD'].sum())
+
+        fixmoti_TC.append(Benefit_cost[(Benefit_cost['Year'] >= x1[i])&(Benefit_cost['Year'] < x1[i+1])]['Moti_TC'].sum())
+        optmoti_TC.append(Benefit_cost[(Benefit_cost['Year'] >= x1[i])&(Benefit_cost['Year'] < x1[i+1])]['Opt_Moti_TC'].sum())
+
+    BC_fix_moti = []
+    BC_opt_moti = []
+    # calculate the benefit/cost ratio
+    for i in range(len(x1)-1):
+        BC_fix_moti.append(min((self_EAD[i] - fixmoti_EAD[i])/fixmoti_TC[i], 5))
+        BC_opt_moti.append(min((self_EAD[i] - optmoti_EAD[i])/optmoti_TC[i], 5))
+
+    fig, ax1 = plt.subplots()
+    bar_width = 5/4
+    ax1.bar(x2 - bar_width, self_EAD, width=bar_width, label="Self_Relo", color='#D3E2B7')
+    ax1.bar(x2, fixmoti_EAD, width=bar_width, label="Fixed_Subsidy_Relo", color='#F7C97E')
+    ax1.bar(x2 + bar_width, optmoti_EAD, width=bar_width, label='Opt_Subsidy_Relo', color='#ECA8A9')
+    ax1.set_ylabel('EAD every five years')
+    ax1.set_xlabel('Year')
+    ax1.set_xticks(x2)
+    ax1.set_ylim(0, 8e9)
+    ax1.legend(bbox_to_anchor=(0.60, 1.0), loc='upper right')
+
+    ax2 = ax1.twinx()
+    ax2.plot(x2, BC_fix_moti, marker = 'o', color='#D47828')
+    ax2.plot(x2 + bar_width, BC_opt_moti, marker = 'o', color='#BF6070')
+    ax2.set_ylabel('Benefit/Cost every five years')
+    ax2.set_ylim(0, 6)
+
+    plt.title("EAD and Benefit/Cost every five years_Discounted")
+    plt.show()
+
+# Bar_EAD_Line_BC_Discounting(Benefit_cost_30, 0.05, 30)
+#
+# Bar_EAD_Line_BC_Discounting(Benefit_cost_50, 0.05, 50)
+
 
 # a function to display the variable vs mhi_ratio; the variable that can be used include
 #         mhi_result[mhi]['Total_Relocation_Num'] = 0
@@ -181,12 +245,12 @@ def mhi_analysis_visualization(mhi_result, column_name):
             plt.text(i + 1, value, str('%0.2e' % value), ha='center', va='bottom')
     plt.show()
 
-mhi_analysis_visualization(mhi_result, 'Total_Relocation_Num')
-mhi_analysis_visualization(mhi_result, 'Total_Subsidy_Amount')
-mhi_analysis_visualization(mhi_result, 'Total_Cost')
-mhi_analysis_visualization(mhi_result, 'Percent_Relocation')
-mhi_analysis_visualization(mhi_result, 'Avg_Subsidy_Amount')
-mhi_analysis_visualization(mhi_result, 'Avg_TC')
+# mhi_analysis_visualization(mhi_result, 'Total_Relocation_Num')
+# mhi_analysis_visualization(mhi_result, 'Total_Subsidy_Amount')
+# mhi_analysis_visualization(mhi_result, 'Total_Cost')
+# mhi_analysis_visualization(mhi_result, 'Percent_Relocation')
+# mhi_analysis_visualization(mhi_result, 'Avg_Subsidy_Amount')
+# mhi_analysis_visualization(mhi_result, 'Avg_TC')
 
 def Relocation_year_each_mhi(mhi_result, colname, calLength):
     mhi_list = list(mhi_result.iloc[:, 0])
@@ -208,7 +272,7 @@ def Relocation_year_each_mhi(mhi_result, colname, calLength):
         #     plt.text(i, count, str(count), ha = 'center', va = 'bottom')
         plt.show()
 
-# Relocation_year_each_mhi(mhi_result, 'Relocation_Year', 30)
+Relocation_year_each_mhi(mhi_result, 'Relocation_Year', 30)
 
 def Relocation_year_Aggregate(mhi_result, colname, calLength):
     mhi_list = list(mhi_result.iloc[:, 0])
@@ -252,5 +316,5 @@ def Relocation_year_Aggregate(mhi_result, colname, calLength):
     plt.legend()
     plt.show()
 
-# Relocation_year_Aggregate(mhi_result, 'Relocation_Year', 30)
+Relocation_year_Aggregate(mhi_result, 'Relocation_Year', 30)
 
