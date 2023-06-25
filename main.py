@@ -25,7 +25,7 @@ if __name__ == '__main__':
     # merging the structure data and ead data together and obtain the inputs for later functions (creating residents)
     merged_df = resident_info.merge(ead_info, on='structure_id', how='inner', validate = '1:1')
 
-    resident_info = merged_df[['structure_id', 'replacement_cost', 'relocation_cost']]
+    resident_info = merged_df[['structure_id', 'replacement_cost', 'relocation_cost', 'mhi_ratio']]
     ead_info = merged_df.drop(['replacement_cost', 'relocation_cost'], axis=1)
 
     # Define the key of ead_info, and from which column the ead starts

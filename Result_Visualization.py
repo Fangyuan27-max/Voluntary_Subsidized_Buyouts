@@ -19,7 +19,7 @@ Relocation_num_50 = pd.read_csv(base_dir + num_file_path_50)
 Adoption_rate_50 = pd.read_csv(base_dir + adoption_rate_path_50)
 Benefit_cost_50 = pd.read_csv(base_dir + bcr_path_50)
 
-mhi_result_path = 'The result output/mhi_result.csv'
+mhi_result_path = 'mhi_result.csv'
 mhi_result = pd.read_csv(base_dir + mhi_result_path)
 
 # A function to plot the bar chart of the number of relocation every year
@@ -161,33 +161,36 @@ def Bar_EAD_Line_BC(Benefit_cost, calLength):
 #         mhi_result[mhi]['Avg_TC'] = 0
 def mhi_analysis_visualization(mhi_result, column_name):
     mhi_list = list(mhi_result.iloc[:, 0])
-    print(mhi)
-    x = np.arange(1, len(mhi)+1, 1)
-    value = mhi_result[column_name]
+    # print(mhi_list)
+    x = np.arange(1, len(mhi_list)+1, 1)
+    value_list = mhi_result[column_name]
 
     plt.figure()
     bar_width = 1/2
-    plt.bar(x, value, width=bar_width, color='#ECA8A9')
+    plt.bar(x, value_list, width=bar_width, color='#ECA8A9')
 
     plt.xlabel('Mhi_Ratio')
     plt.ylabel(column_name)
     plt.title(column_name + ' VS MHI_Ratio')
-    plt.xticks(mhi_list, x)
+    plt.xticks(x, mhi_list)
+
+    for i, value in enumerate(value_list):
+        plt.text(i+1, value, str(value), ha='center', va='bottom')
     plt.show()
 
-# mhi_analysis_visualization(mhi_result, 'Total_Relocation_Num')
-# mhi_analysis_visualization(mhi_result, 'Total_Subsidy_Amount')
-# mhi_analysis_visualization(mhi_result, 'Total_Cost')
-# mhi_analysis_visualization(mhi_result, 'Percent_Relocation')
-# mhi_analysis_visualization(mhi_result, 'Avg_Subsidy_Amount')
-# mhi_analysis_visualization(mhi_result, 'Avg_TC')
+mhi_analysis_visualization(mhi_result, 'Total_Relocation_Num')
+mhi_analysis_visualization(mhi_result, 'Total_Subsidy_Amount')
+mhi_analysis_visualization(mhi_result, 'Total_Cost')
+mhi_analysis_visualization(mhi_result, 'Percent_Relocation')
+mhi_analysis_visualization(mhi_result, 'Avg_Subsidy_Amount')
+mhi_analysis_visualization(mhi_result, 'Avg_TC')
 
-def Relocation_year(mhi_result, colname, calLength):
-    mhi_list = list(mhi_result.iloc[:, 0])
-
-    for mhi in mhi_list:
-        relocation_year = list(mhi_result[mhi_result.iloc[:, 0] == mhi][colname])[0]
-
-        print(relocation_year)
-Relocation_year(mhi_result, 'Relocation_Year', 30)
+# def Relocation_year(mhi_result, colname, calLength):
+#     mhi_list = list(mhi_result.iloc[:, 0])
+#
+#     for mhi in mhi_list:
+#         relocation_year = list(mhi_result[mhi_result.iloc[:, 0] == mhi][colname])[0]
+#
+#         print(relocation_year)
+# Relocation_year(mhi_result, 'Relocation_Year', 30)
 
