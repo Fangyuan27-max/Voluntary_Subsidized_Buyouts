@@ -89,14 +89,14 @@ if __name__ == '__main__':
     benefit_cost_result = benefit_cost(Gov, resList, calLength)
     benefit_cost_result.to_csv('benefit_cost_result.csv')
 
-    mode = 'Opt'
+    mode1 = 'Opt'
     mhi_list = [0.5, 0.85, 1.25, 2, 999]
-    mhi_result = analysis_mhi(resList, mhi_list, mode, subPercent, calLength)
+    mhi_result = analysis_mhi(resList, mhi_list, mode1, subPercent, calLength)
     mhi_result.to_csv('mhi_result_opt.csv')
 
-    mode = 'Fix'
+    mode2 = 'Fix'
     mhi_list = [0.5, 0.85, 1.25, 2, 999]
-    mhi_result = analysis_mhi(resList, mhi_list, mode, subPercent, calLength)
+    mhi_result = analysis_mhi(resList, mhi_list, mode2, subPercent, calLength)
     mhi_result.to_csv('mhi_result_fix.csv')
 
 
