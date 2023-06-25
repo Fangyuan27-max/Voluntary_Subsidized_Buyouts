@@ -5,7 +5,7 @@ import Class_Gov, Class_Res
 from Objects_Creater_Res import CreateRes
 from Gov_wo_opt import ResRun_WO_Optimization
 from Gov_w_opt import Run_W_Optimization
-from Result_Analysis_Functions import relocation_num_year, adoption_rate_year, benefit_cost
+from Result_Analysis_Functions import relocation_num_year, adoption_rate_year, benefit_cost, analysis_mhi
 from Tool_functions import selecting_percentage
 
 ## Perform simulation for three different mode:
@@ -88,6 +88,16 @@ if __name__ == '__main__':
     # The EAD occured, subsidy needed, and the total cost (subsidy + replacement cost) each year of the three modes
     benefit_cost_result = benefit_cost(Gov, resList, calLength)
     benefit_cost_result.to_csv('benefit_cost_result.csv')
+
+    mode = 'Opt'
+    mhi_list = [0.5, 0.85, 1.25, 2, 999]
+    mhi_result = analysis_mhi(resList, mhi_list, mode, subPercent, calLength)
+    mhi_result.to_csv('mhi_result_opt.csv')
+
+    mode = 'Fix'
+    mhi_list = [0.5, 0.85, 1.25, 2, 999]
+    mhi_result = analysis_mhi(resList, mhi_list, mode, subPercent, calLength)
+    mhi_result.to_csv('mhi_result_fix.csv')
 
 
 

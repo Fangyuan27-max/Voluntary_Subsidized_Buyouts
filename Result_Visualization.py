@@ -175,7 +175,10 @@ def mhi_analysis_visualization(mhi_result, column_name):
     plt.xticks(x, mhi_list)
 
     for i, value in enumerate(value_list):
-        plt.text(i+1, value, str(value), ha='center', va='bottom')
+        if column_name == 'Percent_Relocation':
+            plt.text(i+1, value, str('%0.2f'%value), ha='center', va='bottom')
+        else:
+            plt.text(i + 1, value, str('%0.2e' % value), ha='center', va='bottom')
     plt.show()
 
 mhi_analysis_visualization(mhi_result, 'Total_Relocation_Num')
@@ -185,12 +188,69 @@ mhi_analysis_visualization(mhi_result, 'Percent_Relocation')
 mhi_analysis_visualization(mhi_result, 'Avg_Subsidy_Amount')
 mhi_analysis_visualization(mhi_result, 'Avg_TC')
 
-# def Relocation_year(mhi_result, colname, calLength):
-#     mhi_list = list(mhi_result.iloc[:, 0])
-#
-#     for mhi in mhi_list:
-#         relocation_year = list(mhi_result[mhi_result.iloc[:, 0] == mhi][colname])[0]
-#
-#         print(relocation_year)
-# Relocation_year(mhi_result, 'Relocation_Year', 30)
+def Relocation_year_each_mhi(mhi_result, colname, calLength):
+    mhi_list = list(mhi_result.iloc[:, 0])
+    for mhi in mhi_list:
+        figtitle = 'Relocation Num Each Year for Mhi_ratio' + str(mhi)
+        relocation_year = list(mhi_result[mhi_result.iloc[:, 0] == mhi][colname])[0]
+        decision_year = np.arange(0, calLength, 1)
+        year_count = []
+        for year in decision_year:
+            year_count.append(relocation_year.count(str(year)))
+
+        plt.bar(decision_year, year_count)
+        plt.xlabel('Year')
+        plt.ylabel('Relocation Num')
+
+        plt.title(figtitle)
+
+        # for i, count in enumerate(year_count):
+        #     plt.text(i, count, str(count), ha = 'center', va = 'bottom')
+        plt.show()
+
+# Relocation_year_each_mhi(mhi_result, 'Relocation_Year', 30)
+
+def Relocation_year_Aggregate(mhi_result, colname, calLength):
+    mhi_list = list(mhi_result.iloc[:, 0])
+    decision_year = np.arange(0, calLength, 1)
+    relocation_result = {}
+    figtitle = 'Relocation Num Each Year for Mhi_Ratio Groups'
+    for year in decision_year:
+        relocation_result[year] = {}
+        relocation_result[year]['Year'] = year
+        for mhi in mhi_list:
+            relocation_year = list(mhi_result[mhi_result.iloc[:, 0] == mhi][colname])[0]
+            relocation_result[year][mhi] = relocation_year.count(str(year))
+    result = pd.DataFrame(relocation_result).T
+
+    time_interval = 5
+    x1 = list(np.arange(0, calLength + 5, time_interval))
+
+    list_collection = {}
+    for mhi in mhi_list:
+        listname = str(mhi) + '_agg'
+        list_collection[listname] = []
+
+    for mhi in mhi_list:
+        listname = str(mhi) + '_agg'
+        for i in np.arange(len(x1) - 1):
+            list_collection[listname].append(result[(result['Year'] >= x1[i]) & (result['Year'] < x1[i + 1])][mhi].sum())
+
+    # plot the relocation by year, however, the results is too dense and have a sharp contrast
+    bar_width = 5 / 6
+    x2 = np.array(x1[1:])
+    plt.figure()
+    count = 0
+    for mhi in mhi_list:
+        count += 1
+        listname = str(mhi) + '_agg'
+        plt.bar(x2 + (count - 3)*bar_width, np.array(list_collection[listname]), width=bar_width, label = str(mhi))
+
+    plt.xlabel('Year')
+    plt.ylabel('Relocation Num')
+    plt.title(figtitle)
+    plt.legend()
+    plt.show()
+
+# Relocation_year_Aggregate(mhi_result, 'Relocation_Year', 30)
 

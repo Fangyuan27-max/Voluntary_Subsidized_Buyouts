@@ -106,7 +106,7 @@ def benefit_cost(gov, resList, calLength):
     return benefit_cost_result
 
 
-def analysis_mhi(gov, resList, mhi_list, calLength):
+def analysis_mhi(resList, mhi_list, mode, subPercent, calLength):
     mhi_result = {}
     for mhi in mhi_list:
         mhi_result[mhi] = {}
@@ -119,20 +119,37 @@ def analysis_mhi(gov, resList, mhi_list, calLength):
         mhi_result[mhi]['Avg_Subsidy_Amount'] = 0
         mhi_result[mhi]['Avg_TC'] = 0
 
-    for mhi in mhi_list:
-        mhi_number = 0
-        for res in resList:
-            if res.mhi_ratio == mhi:
-                mhi_number += 1
-                if res.optimotiFlag == 1:
-                    mhi_result[mhi]['Total_Relocation_Num'] += 1
-                    mhi_result[mhi]['Total_Subsidy_Amount'] += res.Subsidyneeded[res.optmotiMoveYear]
-                    mhi_result[mhi]['Total_cost'] += res.Subsidyneeded[res.optmotiMoveYear] + res.replacementcost + res.relocationcost
-                    mhi_result[mhi]['Relocation_Year'].append(res.optmotiMoveYear)
+    if mode == 'Opt':
+        for mhi in mhi_list:
+            mhi_number = 0
+            for res in resList:
+                if res.mhi_ratio == mhi:
+                    mhi_number += 1
+                    if res.optimotiFlag == 1:
+                        mhi_result[mhi]['Total_Relocation_Num'] += 1
+                        mhi_result[mhi]['Total_Subsidy_Amount'] += res.Subsidyneeded[res.optmotiMoveYear]
+                        mhi_result[mhi]['Total_Cost'] += res.Subsidyneeded[res.optmotiMoveYear] + res.replacementcost + res.relocationcost
+                        mhi_result[mhi]['Relocation_Year'].append(res.optmotiMoveYear)
 
-        mhi_result[mhi]['Percent_relocation'] = mhi_result[mhi]['Total_Relocation_Num']/(mhi_number+1)
-        mhi_result[mhi]['Avg_Subsidy_Amount'] = mhi_result[mhi]['Total_Subsidy_Amount']/mhi_result[mhi]['Total_Relocation_Num']
-        mhi_result[mhi]['Avg_TC'] = mhi_result[mhi]['Total_Cost']/mhi_result[mhi]['Total_Relocation_Num']
+            mhi_result[mhi]['Percent_relocation'] = mhi_result[mhi]['Total_Relocation_Num']/(mhi_number+1)
+            mhi_result[mhi]['Avg_Subsidy_Amount'] = mhi_result[mhi]['Total_Subsidy_Amount']/mhi_result[mhi]['Total_Relocation_Num']
+            mhi_result[mhi]['Avg_TC'] = mhi_result[mhi]['Total_Cost']/mhi_result[mhi]['Total_Relocation_Num']
+
+    elif mode == 'Fix':
+        for mhi in mhi_list:
+            mhi_number = 0
+            for res in resList:
+                if res.mhi_ratio == mhi:
+                    mhi_number += 1
+                    if res.motiMoveFlag == 1:
+                        mhi_result[mhi]['Total_Relocation_Num'] += 1
+                        mhi_result[mhi]['Total_Subsidy_Amount'] += res.replacementcost * subPercent
+                        mhi_result[mhi]['Total_Cost'] += res.replacementcost * (1 + subPercent) + res.relocationcost
+                        mhi_result[mhi]['Relocation_Year'].append(res.motiMoveYear)
+
+            mhi_result[mhi]['Percent_relocation'] = mhi_result[mhi]['Total_Relocation_Num']/(mhi_number+1)
+            mhi_result[mhi]['Avg_Subsidy_Amount'] = mhi_result[mhi]['Total_Subsidy_Amount']/mhi_result[mhi]['Total_Relocation_Num']
+            mhi_result[mhi]['Avg_TC'] = mhi_result[mhi]['Total_Cost']/mhi_result[mhi]['Total_Relocation_Num']
 
     mhi_result_output = pd.DataFrame(mhi_result).T
     return mhi_result_output
