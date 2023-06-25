@@ -46,12 +46,13 @@ if __name__ == '__main__':
     resDisRate = 0.12
     resAlpha = 0.05
     resInflaRate = 0.02
-    calLength = 51
+    calLength = 31
+    totalLength = 51
 
     ## Instantiate residents and choose the near-optimal subsidy percentage
     print("Start simulation")
     starttime1 = time.time()
-    resList = CreateRes(resident_info, ead_info, colname, startcol, disMethod, resDisRate, resAlpha, resInflaRate, calLength)
+    resList = CreateRes(resident_info, ead_info, colname, startcol, disMethod, resDisRate, resAlpha, resInflaRate, calLength, totalLength)
     endtime1 = time.time()
     print("Time used to create the resident list,", endtime1 - starttime1)
 

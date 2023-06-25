@@ -172,7 +172,7 @@ def mhi_analysis_visualization(mhi_result, column_name):
     plt.xlabel('Mhi_Ratio')
     plt.ylabel(column_name)
     plt.title(column_name + ' VS MHI_Ratio')
-    plt.xticks(x, mhi_list)
+    plt.xticks(mhi_list, x)
     plt.show()
 
 # mhi_analysis_visualization(mhi_result, 'Total_Relocation_Num')
