@@ -7,7 +7,7 @@ def Run_W_Optimization(government, resList, calLength):
         for res in resList:
             NPVsum = []
             for year in range(calLength):
-                NPVsum.append(government.pastloss[res.idx][year] + res.Subsidyneeded[year]/(1+government.disRate)**year)
+                NPVsum.append(government.pastloss[res.idx][year] + (res.Subsidyneeded[year]+res.replacementcost + res.relocationcost)/(1+government.disRate)**year)
             government.NPVlossSubsidy[res.idx] = NPVsum
 
             moveYear_Optimize = government.NPVlossSubsidy[res.idx].index(min(government.NPVlossSubsidy[res.idx]))
@@ -23,7 +23,7 @@ def Run_W_Optimization(government, resList, calLength):
         for res in resList:
             NPVsum = []
             for year in range(calLength):
-                NPVsum.append(government.pastloss[res.idx][year] + res.Subsidyneeded[year] / (1 + government.alpha * year))
+                NPVsum.append(government.pastloss[res.idx][year] + (res.Subsidyneeded[year]+res.replacementcost + res.relocationcost) / (1 + government.alpha * year))
             government.NPVlossSubsidy[res.idx] = NPVsum
 
             moveYear_Optimize = government.NPVlossSubsidy[res.idx].index(min(government.NPVlossSubsidy[res.idx]))

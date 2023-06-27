@@ -5,7 +5,7 @@ import Class_Gov, Class_Res
 from Objects_Creater_Res import CreateRes
 from Gov_wo_opt import ResRun_WO_Optimization
 from Gov_w_opt import Run_W_Optimization
-from Result_Analysis_Functions import relocation_num_year, adoption_rate_year, benefit_cost, analysis_mhi
+from Result_Analysis_Functions import relocation_num_year, adoption_rate_year, EAD_WO_Discounting_Cost, EAD_Discounting_Cost,analysis_mhi
 from Tool_functions import selecting_percentage
 
 ## Perform simulation for three different mode:
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     merged_df = resident_info.merge(ead_info, on='structure_id', how='inner', validate = '1:1')
 
     resident_info = merged_df[['structure_id', 'replacement_cost', 'relocation_cost', 'mhi_ratio']]
-    ead_info = merged_df.drop(['replacement_cost', 'relocation_cost'], axis=1)
+    ead_info = merged_df.drop(['replacement_cost', 'relocation_cost', 'mhi_ratio'], axis=1)
 
     # Define the key of ead_info, and from which column the ead starts
     colname = 'structure_id'
@@ -46,13 +46,15 @@ if __name__ == '__main__':
     resDisRate = 0.12
     resAlpha = 0.05
     resInflaRate = 0.02
+
     calLength = 31
+    decLength = 21
     totalLength = 51
 
     ## Instantiate residents and choose the near-optimal subsidy percentage
     print("Start simulation")
     starttime1 = time.time()
-    resList = CreateRes(resident_info, ead_info, colname, startcol, disMethod, resDisRate, resAlpha, resInflaRate, calLength, totalLength)
+    resList = CreateRes(resident_info, ead_info, colname, startcol, disMethod, resDisRate, resAlpha, resInflaRate, calLength, decLength)
     endtime1 = time.time()
     print("Time used to create the resident list,", endtime1 - starttime1)
 
@@ -86,8 +88,11 @@ if __name__ == '__main__':
     adoption_rate.to_csv("Adoption_rate.csv")
 
     # The EAD occured, subsidy needed, and the total cost (subsidy + replacement cost) each year of the three modes
-    benefit_cost_result = benefit_cost(Gov, resList, calLength)
-    benefit_cost_result.to_csv('benefit_cost_result.csv')
+    EAD_Cost = EAD_WO_Discounting_Cost(Gov, resList, calLength, decLength, totalLength)
+    EAD_Cost.to_csv('EAD_Cost.csv')
+
+    EAD_Cost_Dis = EAD_Discounting_Cost(Gov, resList, calLength, decLength, totalLength)
+    EAD_Cost_Dis.to_csv('EAD_Cost_Discounting.csv')
 
     mode1 = 'Opt'
     mhi_list = [0.5, 0.85, 1.25, 2, 999]
@@ -99,6 +104,10 @@ if __name__ == '__main__':
     mhi_result = analysis_mhi(resList, mhi_list, mode2, subPercent, calLength)
     mhi_result.to_csv('mhi_result_fix.csv')
 
+    mode3 = 'Self'
+    mhi_list = [0.5, 0.85, 1.25, 2, 999]
+    mhi_result = analysis_mhi(resList, mhi_list, mode3, subPercent, calLength)
+    mhi_result.to_csv('mhi_result_self.csv')
 
 
 

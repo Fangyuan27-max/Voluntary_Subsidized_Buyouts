@@ -56,15 +56,15 @@ class resident: #around 44 residents in total
         self.FutureLoss = []
         self.Subsidyneeded = []
 
-    def expectedFutureLoss(self, calLength, totalLength):
+    def expectedFutureLoss(self, calLength, decLength):
         for i in range(calLength):
             expectedLoss = 0
             if self.disMethod == "Exponential":
-                for j in range(i, totalLength):
-                    expectedLoss += self.ead[j] / (1 + self.disRate) ** (j - i)
+                for j in range(decLength):
+                    expectedLoss += self.ead[i + j] / (1 + self.disRate) ** j
             elif self.disMethod == 'Hyperbolic':
-                for j in range(i, totalLength):
-                    expectedLoss += self.ead[j] / (1 + self.alpha * (j - i))
+                for j in range(decLength):
+                    expectedLoss += self.ead[i + j] / (1 + self.alpha * j)
             else:
                 print("Please enter a valid discounting method!")
             self.FutureLoss.append(expectedLoss)
