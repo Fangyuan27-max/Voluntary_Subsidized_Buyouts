@@ -114,7 +114,7 @@ def EAD_Discounting_Cost(gov, resList, calLength, decLength, totalLength):
                 else:
                     Opt_Moti_EAD += 0
                 if i == res.optmotiMoveYear:
-                    Opt_Moti_Subsidy += res.Subsidyneeded[i] / ((1 + res.disRate) ** i)
+                    Opt_Moti_Subsidy += res.Subsidyneeded[i] / ((1 + gov.disRate) ** i)
                     Opt_Moti_TC += (res.Subsidyneeded[i] + res.replacementcost + res.relocationcost) / (
                                 (1 + gov.disRate) ** i)
                     if res.selfMoveYear < calLength:
