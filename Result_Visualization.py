@@ -207,6 +207,51 @@ def Bar_EAD_Line_BC_Each_Year(Benefit_cost):
 Bar_EAD_Line_BC_Each_Year(EAD_Cost_WO_Discounting)
 Bar_EAD_Line_BC_Each_Year(EAD_Cost_Discounting)
 
+def EAD_Reduction_Cost(Benefit_cost, calLength):
+    x = np.arange(calLength)
+
+    bar_width = 1 / 3
+    fig, ax1 = plt.subplots()
+    ax1.bar(x, list(Benefit_cost['EAD_Reduction_FS'].values)[0:calLength], width=bar_width, label="EAD_Reduction", color='#FA7F6F')
+    ax1.set_ylabel('EAD Reduction Each Year')
+    ax1.set_xlabel('Year')
+    ax1.set_ylim(0,3e10)
+    ax1.set_xticks(x)
+    plt.xticks(x, rotation = 300)
+    tick_spacing = 5
+    ax1.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+    ax1.legend(bbox_to_anchor=(1.0, 1.0), loc='upper right')
+
+    ax2 = ax1.twinx()
+    ax2.bar(x + bar_width, list(Benefit_cost['Moti_TC'].values)[0:calLength], width=bar_width, label="Cost", color = '#8ECFC9')
+    ax2.set_ylabel('Cost Each Year')
+    ax2.set_ylim(0,3e10)
+    ax2.legend(bbox_to_anchor=(0.85, 0.9), loc='upper right')
+
+    plt.title("EAD Reduction VS Relocation Cost for Fixed Subsidy")
+    plt.show()
+
+    fig2, ax3 = plt.subplots()
+    ax3.bar(x, list(Benefit_cost['EAD_Reduction_OS'].values)[0:calLength], width=bar_width, label="EAD_Reduction",
+            color='#FA7F6F')
+    ax3.set_ylabel('EAD Reduction Each Year')
+    ax3.set_xlabel('Year')
+    ax3.set_ylim(0, 3e10)
+    ax3.set_xticks(x)
+    plt.xticks(x, rotation=300)
+    tick_spacing = 5
+    ax3.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+    ax3.legend(bbox_to_anchor=(1.0, 1.0), loc='upper right')
+
+    ax4 = ax3.twinx()
+    ax4.bar(x + bar_width, list(Benefit_cost['Opt_Moti_TC'].values)[0:calLength], width=bar_width, label="Cost",
+            color='#8ECFC9')
+    ax4.set_ylabel('Cost Each Year')
+    ax4.set_ylim(0, 3e10)
+    ax4.legend(bbox_to_anchor=(0.85, 0.9), loc='upper right')
+    plt.title("EAD Reduction VS Relocation Cost for Optimal Subsidy")
+    plt.show()
+EAD_Reduction_Cost(EAD_Cost_Discounting, 31)
 
 # a function to display the variable vs mhi_ratio; the variable that can be used include
 #         mhi_result[mhi]['Total_Relocation_Num'] = 0
