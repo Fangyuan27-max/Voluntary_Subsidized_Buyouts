@@ -107,7 +107,7 @@ def discount(value, dr, length):
 
 
 # A function to plot the EAD(bar chart) and benefit/cost ratio(line chart) simultaneously
-def Bar_EAD_Line_BC(Benefit_cost, DG, calLength):
+def Bar_EAD_Line_BC(Benefit_cost, calLength):
     x = Benefit_cost['Year']
     x1 = np.arange(0, calLength + 5, 5)
     x2 = x1[1:]
@@ -135,13 +135,10 @@ def Bar_EAD_Line_BC(Benefit_cost, DG, calLength):
         optmoti_TC.append(
             Benefit_cost[(Benefit_cost['Year'] >= x1[i]) & (Benefit_cost['Year'] < x1[i + 1])]['Opt_Moti_TC'].sum())
 
-        tmplist1 = list(
-            Benefit_cost[(Benefit_cost['Year'] >= x1[i]) & (Benefit_cost['Year'] < x1[i + 1])]['EAD_Reduction_FS'])
-        tmplist2 = list(
-            Benefit_cost[(Benefit_cost['Year'] >= x1[i]) & (Benefit_cost['Year'] < x1[i + 1])]['EAD_Reduction_OS'])
-
-        fixed_reduced_EAD.append(sum([discount(tmplist1[i], DG, i - 2) for i in range(5)]))
-        opt_reduced_EAD.append(sum([discount(tmplist2[i], DG, i - 2) for i in range(5)]))
+        fixed_reduced_EAD.append(Benefit_cost[(Benefit_cost['Year'] >= x1[i]) & (Benefit_cost['Year'] < x1[i + 1])][
+                                     'EAD_Reduction_FS'].sum())
+        opt_reduced_EAD.append(Benefit_cost[(Benefit_cost['Year'] >= x1[i]) & (Benefit_cost['Year'] < x1[i + 1])][
+                                   'EAD_Reduction_OS'].sum())
 
     BC_fix_moti = []
     BC_opt_moti = []
@@ -149,8 +146,6 @@ def Bar_EAD_Line_BC(Benefit_cost, DG, calLength):
     for i in range(len(x1) - 1):
         BC_fix_moti.append(min(fixed_reduced_EAD[i] / fixmoti_TC[i], 5))
         BC_opt_moti.append(min(opt_reduced_EAD[i] / optmoti_TC[i], 5))
-    #        BC_fix_moti.append(min((self_EAD[i] - fixmoti_EAD[i])/fixmoti_TC[i], 5))
-    #        BC_opt_moti.append(min((self_EAD[i] - optmoti_EAD[i])/optmoti_TC[i], 5))
 
     fig, ax1 = plt.subplots()
     bar_width = 5 / 4
@@ -172,8 +167,8 @@ def Bar_EAD_Line_BC(Benefit_cost, DG, calLength):
     plt.show()
 
 
-Bar_EAD_Line_BC(EAD_Cost_WO_Discounting, 0.05, 30)
-Bar_EAD_Line_BC(EAD_Cost_Discounting, 0.05, 30)
+# Bar_EAD_Line_BC(EAD_Cost_WO_Discounting, 30)
+# Bar_EAD_Line_BC(EAD_Cost_Discounting, 30)
 
 
 def Bar_EAD_Line_BC_Each_Year(Benefit_cost):
