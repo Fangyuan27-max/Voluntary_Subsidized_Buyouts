@@ -73,4 +73,3 @@ class resident: #around 44 residents in total
 
 
 
-

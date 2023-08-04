@@ -5,7 +5,7 @@ import Class_Gov, Class_Res
 from Objects_Creater_Res import CreateRes
 from Gov_wo_opt import ResRun_WO_Optimization
 from Gov_w_opt import Run_W_Optimization
-from Result_Analysis_Functions import relocation_num_year, adoption_rate_year, EAD_WO_Discounting_Cost, EAD_Discounting_Cost,analysis_mhi
+from Result_Analysis_Functions import relocation_num_year, adoption_rate_year, EAD_Discounting_Cost,analysis_mhi, Relocated_Residents
 from Tool_functions import selecting_percentage
 
 ## Perform simulation for three different mode:
@@ -32,10 +32,6 @@ if __name__ == '__main__':
     colname = 'structure_id'
     startcol = 1
 
-    ## The sample information
-    # resident_info = pd.read_csv('sample_resident.csv')
-    # ead_info = pd.read_csv('sample_eadlist.csv')
-
     ## Government parameters and creating government objects
     disMethodGov = 'Exponential'
     disRateGov = 0.05
@@ -47,8 +43,8 @@ if __name__ == '__main__':
     resAlpha = 0.05
     resInflaRate = 0.02
 
-    calLength = 31
-    decLength = 21
+    calLength = 21
+    decLength = 31
     totalLength = 51
 
     ## Instantiate residents and choose the near-optimal subsidy percentage
@@ -64,21 +60,25 @@ if __name__ == '__main__':
     # print("The selected fixed percentage:", selected_per)
 
     # simualtion for 1 and 2
-    selected_per = 0.49 # the final selected percentage
+    selected_per = 0.5 # the final selected percentage
     subPercent = selected_per
     Gov = Class_Gov.government(disMethodGov, disRateGov, disAlphaGov)
     starttime2 = time.time()
-    Gov, resList = ResRun_WO_Optimization(Gov, resList, subPercent, calLength)
+    Gov, resList = ResRun_WO_Optimization(Gov, resList, subPercent, calLength, decLength, totalLength)
     endtime2 = time.time()
     print("Time used to run simulation without optimization,", endtime2 - starttime2)
 
     # simulation for 3
     starttime3 = time.time()
-    Gov = Run_W_Optimization(Gov, resList, calLength)
+    Gov = Run_W_Optimization(Gov, resList, calLength, decLength)
     endtime3 = time.time()
     print("Time used to run simulation optimization,", endtime3 - starttime3)
 
-    ## Result analysis and visualization parts
+    # save the resident and government info for future investigation
+    # np.save('Resident.npy', resList)
+    # np.save('Government.npy', Gov)
+
+    # ## Result analysis and visualization parts
     # The relocation number in each year for three modes
     relocation_num = relocation_num_year(Gov, resList, calLength)
     relocation_num.to_csv("Relocation_num_each_year.csv")
@@ -87,27 +87,28 @@ if __name__ == '__main__':
     adoption_rate = adoption_rate_year(Gov, resList, calLength)
     adoption_rate.to_csv("Adoption_rate.csv")
 
-    # The EAD occured, subsidy needed, and the total cost (subsidy + replacement cost) each year of the three modes
-    EAD_Cost = EAD_WO_Discounting_Cost(Gov, resList, calLength, decLength, totalLength)
-    EAD_Cost.to_csv('EAD_Cost.csv')
+    # EAD Reduction VS Cost
+    EADReduction_Cost_Dis = EAD_Discounting_Cost(Gov, resList, calLength, decLength, totalLength)
+    EADReduction_Cost_Dis.to_csv('EADReduction_Cost.csv')
 
-    EAD_Cost_Dis = EAD_Discounting_Cost(Gov, resList, calLength, decLength, totalLength)
-    EAD_Cost_Dis.to_csv('EAD_Cost_Discounting.csv')
+    # Relocated residents for three modes; for self-relocation, the csv contains all self-relocated residents, for fixed_motivated/optimal_motivated,
+    # residents relocated is the union of self_relocated csv and motivated_relocated csv
+    Self_relocation_DF, Fixed_relocation_DF, Optimal_relocation_DF = Relocated_Residents(resList)
+    Self_relocation_DF.to_csv("Self_Relocated_Residents.csv")
+    Fixed_relocation_DF.to_csv("Fixed_Relocated_Residents.csv")
+    Optimal_relocation_DF.to_csv("Optimal_Relocated_residents.csv")
 
     mode1 = 'Opt'
     mhi_list = [0.5, 0.85, 1.25, 2, 999]
-    mhi_result = analysis_mhi(resList, mhi_list, mode1, subPercent, calLength)
+    mhi_result = analysis_mhi(Gov, resList, mhi_list, mode1, subPercent, calLength)
     mhi_result.to_csv('mhi_result_opt.csv')
 
     mode2 = 'Fix'
     mhi_list = [0.5, 0.85, 1.25, 2, 999]
-    mhi_result = analysis_mhi(resList, mhi_list, mode2, subPercent, calLength)
+    mhi_result = analysis_mhi(Gov, resList, mhi_list, mode2, subPercent, calLength)
     mhi_result.to_csv('mhi_result_fix.csv')
 
     mode3 = 'Self'
     mhi_list = [0.5, 0.85, 1.25, 2, 999]
-    mhi_result = analysis_mhi(resList, mhi_list, mode3, subPercent, calLength)
+    mhi_result = analysis_mhi(Gov, resList, mhi_list, mode3, subPercent, calLength)
     mhi_result.to_csv('mhi_result_self.csv')
-
-
-

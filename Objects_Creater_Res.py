@@ -4,9 +4,11 @@ def CreateRes(resident_info, ead_info, colname, startcol,  disMethod, disRate, a
     # Instantiate residents
     res_list = []
     for index, res in resident_info.iterrows():
+        # omit the title row
         if index == 0:
             continue
 
+        # else, read the ead data from year 0 to year 50, store as a list
         eadlist = ead_info.loc[ead_info[colname] == res[colname]].values.tolist()[0][startcol:]
 
         replacement_cost = int(res['replacement_cost'])
@@ -18,6 +20,7 @@ def CreateRes(resident_info, ead_info, colname, startcol,  disMethod, disRate, a
         # calculate the expected future loss and determine when to relocate for every resident
         res_list.append(resident)
     return res_list
+
 
 
 

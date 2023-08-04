@@ -25,14 +25,14 @@ class government:
         self.obj_optimal_subsidy_replacement = 0
 
     # A function to calculate the discounted
-    def discountedPastLoss(self, residents, calLength):
+    def discountedPastLoss(self, residents, totalLength):
         for resident in residents:
             self.pastloss[resident.idx] = {}
-            for i in range(calLength):
+            for i in range(totalLength):
                 discountedLoss = 0
                 if self.disMethod == "Exponential":
                     for j in range(0, i):
-                        discountedLoss += resident.ead[j] / (1 + self.disRate) ** (j - i)
+                        discountedLoss += resident.ead[j] / (1 + self.disRate) ** j
                 elif self.disMethod == 'Hyperbolic':
                     for j in range(0, i):
                         discountedLoss += resident.ead[j] / (1 + self.alpha * j)
@@ -40,12 +40,12 @@ class government:
                     print("Please enter a valid discounting method!")
                 self.pastloss[resident.idx][i] = discountedLoss
 
-    def calculating_objective_WO_optimization(self, subPercent, residents, calLength):
+    def calculating_objective_WO_optimization(self, subPercent, residents, calLength, totalLength):
         for res in residents:
             if res.selfMoveYear < calLength:
                 self.objective_wo_subsidy += self.pastloss[res.idx][res.selfMoveYear]
             else:
-                self.objective_wo_subsidy += self.pastloss[res.idx][calLength - 1]
+                self.objective_wo_subsidy += self.pastloss[res.idx][totalLength - 1]
 
             if res.motiMoveYear < calLength:
                 self.objective_fixed_subsidy += self.pastloss[res.idx][res.motiMoveYear] + subPercent * res.replacementcost /((1 + self.disRate)**res.motiMoveYear)
