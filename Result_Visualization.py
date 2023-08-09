@@ -6,8 +6,8 @@ import matplotlib.ticker as ticker
 num_file_path = 'Relocation_num_each_year.csv'
 adoption_rate_path = 'Adoption_rate.csv'
 EAD_Cost_Discounting_path = 'EADReduction_Cost.csv'
-Fixed_Relocation_Residents_path = 'Fixed_Relocation_Residents.csv'
-Optimal_Relocation_Residents_path = 'Optimal_Relocation_Residents'
+Fixed_Relocation_Residents_path = 'Fixed_Relocated_Residents.csv'
+Optimal_Relocation_Residents_path = 'Optimal_Relocated_Residents.csv'
 
 Relocation_num = pd.read_csv(num_file_path)
 Adoption_rate = pd.read_csv(adoption_rate_path)
@@ -30,19 +30,6 @@ def Bar_relocation(Relocation_num, calLength):
     y1 = Relocation_num['Self_relocation']
     y2 = Relocation_num['Moti_relocation']
     y3 = Relocation_num['Opt_moti_relocation']
-
-    # plot the relocation by year, however, the results is too dense and have a sharp contrast
-    # bar_width = 1 / 4
-    # plt.figure()
-    # plt.bar(x, y1, width=bar_width, label="Self_Relo")
-    # plt.bar(x + bar_width, y2, width=bar_width, label="Fixed_Subsidy_Relo")
-    # plt.bar(x + 2 * bar_width, y3, width=bar_width, label='Opt_Subsidy_Relo')
-    # plt.xlabel('Year')
-    # plt.ylabel('The number of relocation')
-    # plt.title('The relocation number each year under three relocation modes')
-    # plt.legend()
-    # plt.xticks(x + bar_width, x)
-    # plt.show()
 
     # aggregated the relocation number to a 5-year or 10-year time period
     time_interval = 5
@@ -115,8 +102,8 @@ def Bar_EAD_Line_BC(Benefit_cost, calLength):
     fixmoti_EAD = []
     optmoti_EAD = []
 
-    fixmoti_TC = []
-    optmoti_TC = []
+    fixmoti_Subsidy = []
+    optmoti_Subsidy = []
 
     fixed_reduced_EAD = []
     opt_reduced_EAD = []
@@ -130,10 +117,10 @@ def Bar_EAD_Line_BC(Benefit_cost, calLength):
         optmoti_EAD.append(
             Benefit_cost[(Benefit_cost['Year'] >= x1[i]) & (Benefit_cost['Year'] < x1[i + 1])]['Opt_Moti_EAD'].sum())
 
-        fixmoti_TC.append(
-            Benefit_cost[(Benefit_cost['Year'] >= x1[i]) & (Benefit_cost['Year'] < x1[i + 1])]['Moti_TC'].sum())
-        optmoti_TC.append(
-            Benefit_cost[(Benefit_cost['Year'] >= x1[i]) & (Benefit_cost['Year'] < x1[i + 1])]['Opt_Moti_TC'].sum())
+        fixmoti_Subsidy.append(
+            Benefit_cost[(Benefit_cost['Year'] >= x1[i]) & (Benefit_cost['Year'] < x1[i + 1])]['Moti_Subsidy'].sum())
+        optmoti_Subsidy.append(
+            Benefit_cost[(Benefit_cost['Year'] >= x1[i]) & (Benefit_cost['Year'] < x1[i + 1])]['Opt_Moti_Subsidy'].sum())
 
         fixed_reduced_EAD.append(Benefit_cost[(Benefit_cost['Year'] >= x1[i]) & (Benefit_cost['Year'] < x1[i + 1])][
                                      'EAD_Reduction_FS_SR'].sum())
@@ -144,8 +131,8 @@ def Bar_EAD_Line_BC(Benefit_cost, calLength):
     BC_opt_moti = []
     # calculate the benefit/cost ratio
     for i in range(len(x1) - 1):
-        BC_fix_moti.append(min(fixed_reduced_EAD[i] / fixmoti_TC[i], 5))
-        BC_opt_moti.append(min(opt_reduced_EAD[i] / optmoti_TC[i], 5))
+        BC_fix_moti.append(min(fixed_reduced_EAD[i] / fixmoti_Subsidy[i], 5))
+        BC_opt_moti.append(min(opt_reduced_EAD[i] / optmoti_Subsidy[i], 5))
 
     fig, ax1 = plt.subplots()
     bar_width = 5 / 4
@@ -154,7 +141,7 @@ def Bar_EAD_Line_BC(Benefit_cost, calLength):
     ax1.bar(x2 + bar_width, optmoti_EAD, width=bar_width, label='Opt_Subsidy_Relo', color='#ECA8A9')
     ax1.set_ylabel('EAD every five years')
     ax1.set_xlabel('Year')
-    ax1.set_xticks(x2)
+    ax1.set_xticks(x2, ['Year 0-4', 'Year 5-9', 'Year 10-14', 'Year 15-19'])
     ax1.legend(bbox_to_anchor=(1.0, 1.0), loc='upper right')
 
     ax2 = ax1.twinx()
@@ -166,7 +153,6 @@ def Bar_EAD_Line_BC(Benefit_cost, calLength):
     plt.title("EAD and Benefit/Cost every five years")
     plt.show()
 
-
 # Bar_EAD_Line_BC(EAD_Cost_Discounting, 20)
 
 def Bar_EAD_Line_BC_Each_Year(Benefit_cost):
@@ -177,9 +163,9 @@ def Bar_EAD_Line_BC_Each_Year(Benefit_cost):
     BC_opt_moti = []
     # calculate the benefit/cost ratio
     for i in range(len(x)):
-        BC_fix_moti.append(min(Benefit_cost.loc[i, 'EAD_Reduction_FS_SR'] / (Benefit_cost.loc[i, 'Moti_TC'] + 1), 5))
+        BC_fix_moti.append(min(Benefit_cost.loc[i, 'EAD_Reduction_FS_SR'] / (Benefit_cost.loc[i, 'Moti_Subsidy'] + 1), 5))
         BC_opt_moti.append(
-            min(Benefit_cost.loc[i, 'EAD_Reduction_OS_SR'] / (Benefit_cost.loc[i, 'Opt_Moti_TC'] + 1), 5))
+            min(Benefit_cost.loc[i, 'EAD_Reduction_OS_SR'] / (Benefit_cost.loc[i, 'Opt_Moti_Subsidy'] + 1), 5))
 
     fig, ax1 = plt.subplots()
     bar_width = 1 / 4
@@ -203,7 +189,6 @@ def Bar_EAD_Line_BC_Each_Year(Benefit_cost):
     plt.title("EAD and Benefit/Cost every year")
     plt.show()
 
-
 # Bar_EAD_Line_BC_Each_Year(EAD_Cost_Discounting)
 
 def EAD_Reduction_Cost(Benefit_cost, calLength):
@@ -215,18 +200,18 @@ def EAD_Reduction_Cost(Benefit_cost, calLength):
             color='#FA7F6F')
     ax1.set_ylabel('EAD Reduction Each Year')
     ax1.set_xlabel('Year')
-    ax1.set_ylim(0, 3e9)
-    ax1.set_xticks(x)
+    ax1.set_ylim(0, 1.5e10)
+    ax1.set_xticks(x, )
     plt.xticks(x, rotation=300)
     tick_spacing = 5
     ax1.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
     ax1.legend(bbox_to_anchor=(1.0, 1.0), loc='upper right')
 
     ax2 = ax1.twinx()
-    ax2.bar(x + bar_width, list(Benefit_cost['Moti_TC'].values)[0:calLength], width=bar_width, label="Cost",
+    ax2.bar(x + bar_width, list(Benefit_cost['Moti_Subsidy'].values)[0:calLength], width=bar_width, label="Cost",
             color='#8ECFC9')
     ax2.set_ylabel('Cost Each Year')
-    ax2.set_ylim(0, 3e9)
+    ax2.set_ylim(0, 1.5e10)
     ax2.legend(bbox_to_anchor=(0.85, 0.9), loc='upper right')
 
     plt.title("EAD Reduction VS Relocation Cost for Fixed Subsidy")
@@ -237,7 +222,7 @@ def EAD_Reduction_Cost(Benefit_cost, calLength):
             color='#FA7F6F')
     ax3.set_ylabel('EAD Reduction Each Year')
     ax3.set_xlabel('Year')
-    ax3.set_ylim(0, 3e9)
+    ax3.set_ylim(0, 1.5e10)
     ax3.set_xticks(x)
     plt.xticks(x, rotation=300)
     tick_spacing = 5
@@ -245,15 +230,14 @@ def EAD_Reduction_Cost(Benefit_cost, calLength):
     ax3.legend(bbox_to_anchor=(1.0, 1.0), loc='upper right')
 
     ax4 = ax3.twinx()
-    ax4.bar(x + bar_width, list(Benefit_cost['Opt_Moti_TC'].values)[0:calLength], width=bar_width, label="Cost",
+    ax4.bar(x + bar_width, list(Benefit_cost['Opt_Moti_Subsidy'].values)[0:calLength], width=bar_width, label="Cost",
             color='#8ECFC9')
     ax4.set_ylabel('Cost Each Year')
-    ax4.set_ylim(0, 3e9)
+    ax4.set_ylim(0, 1.5e10)
     ax4.legend(bbox_to_anchor=(0.85, 0.9), loc='upper right')
     plt.title("EAD Reduction VS Relocation Cost for Optimal Subsidy")
+    plt.show()
 
-
-#     plt.show()
 # EAD_Reduction_Cost(EAD_Cost_Discounting, 21)
 
 def Aggregated_EAD_Reduction_Cost(Benefit_cost, calLength):
@@ -265,30 +249,28 @@ def Aggregated_EAD_Reduction_Cost(Benefit_cost, calLength):
 
     for i in x:
         fixed_ead_reduction.append(sum(list(
-            Benefit_cost[Benefit_cost['Year'].isin([i + j for j in range(0, 6)])]['EAD_Reduction_FS_SR'].values)))
+            Benefit_cost[Benefit_cost['Year'].isin([i + j for j in range(0, 5)])]['EAD_Reduction_FS_SR'].values)))
         fixed_cost.append(
-            sum(list(Benefit_cost[Benefit_cost['Year'].isin([i + j for j in range(0, 6)])]['Moti_TC'].values)))
+            sum(list(Benefit_cost[Benefit_cost['Year'].isin([i + j for j in range(0, 5)])]['Moti_Subsidy'].values)))
         optimal_ead_reduction.append(sum(list(
-            Benefit_cost[Benefit_cost['Year'].isin([i + j for j in range(0, 6)])]['EAD_Reduction_OS_SR'].values)))
+            Benefit_cost[Benefit_cost['Year'].isin([i + j for j in range(0, 5)])]['EAD_Reduction_OS_SR'].values)))
         optimal_cost.append(
-            sum(list(Benefit_cost[Benefit_cost['Year'].isin([i + j for j in range(0, 6)])]['Opt_Moti_TC'].values)))
+            sum(list(Benefit_cost[Benefit_cost['Year'].isin([i + j for j in range(0, 5)])]['Opt_Moti_Subsidy'].values)))
 
     bar_width = 1 / 3
     fig, ax1 = plt.subplots()
     ax1.bar(x, fixed_ead_reduction, width=bar_width, label="EAD_Reduction", color='#FA7F6F')
     ax1.set_ylabel('EAD Reduction Every Five Years')
     ax1.set_xlabel('Year')
-    ax1.set_ylim(0, 3e9)
-    ax1.set_xticks(x)
-    plt.xticks(x, rotation=300)
-    tick_spacing = 5
-    ax1.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+    ax1.set_ylim(0, 1.5e10)
+    ax1.set_xticks(x, ['Year 0-4', 'Year 5-9', 'Year 10-14', 'Year 15-19'])
+    plt.xticks(x)
     ax1.legend(bbox_to_anchor=(1.0, 1.0), loc='upper right')
 
     ax2 = ax1.twinx()
     ax2.bar(x + bar_width, fixed_cost, width=bar_width, label="Cost", color='#8ECFC9')
     ax2.set_ylabel('Cost Every Five Years')
-    ax2.set_ylim(0, 3e9)
+    ax2.set_ylim(0, 1.5e10)
     ax2.legend(bbox_to_anchor=(0.85, 0.9), loc='upper right')
 
     plt.title("EAD Reduction VS Relocation Cost for Fixed Subsidy")
@@ -299,24 +281,21 @@ def Aggregated_EAD_Reduction_Cost(Benefit_cost, calLength):
             color='#FA7F6F')
     ax3.set_ylabel('EAD Reduction Every Five Years')
     ax3.set_xlabel('Year')
-    ax3.set_ylim(0, 3e9)
-    ax3.set_xticks(x)
-    plt.xticks(x, rotation=300)
-    tick_spacing = 5
-    ax3.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+    ax3.set_ylim(0, 1.5e10)
+    ax3.set_xticks(x, ['Year 0-4', 'Year 5-9', 'Year 10-14', 'Year 15-19'])
+    plt.xticks(x)
     ax3.legend(bbox_to_anchor=(1.0, 1.0), loc='upper right')
 
     ax4 = ax3.twinx()
     ax4.bar(x + bar_width, optimal_cost, width=bar_width, label="Cost",
             color='#8ECFC9')
     ax4.set_ylabel('Cost Every Five Years')
-    ax4.set_ylim(0, 3e9)
+    ax4.set_ylim(0, 1.5e10)
     ax4.legend(bbox_to_anchor=(0.85, 0.9), loc='upper right')
     plt.title("EAD Reduction VS Relocation Cost for Optimal Subsidy")
     plt.show()
 
-
-# Aggregated_EAD_Reduction_Cost(EAD_Cost_Discounting, 21)
+# Aggregated_EAD_Reduction_Cost(EAD_Cost_Discounting, 20)
 
 ## a function to represent the optimal subsidy amount as a percentage of the replacement cost
 def subsidy_percentage(Optimal_Residents):
@@ -354,29 +333,22 @@ def mhi_analysis_visualization(mhi_result, column_name):
     plt.xticks(x, mhi_list)
 
     if column_name == 'Total_Relocation_Num':
-        plt.ylim(0, 22000)
+        plt.ylim(0, 30000)
     elif column_name == 'Percent_Relocation':
-        plt.ylim(0, 0.10)
-    elif column_name == 'Total_Subsidy_Amount':
-        plt.ylim(0, 1e9)
-    elif column_name == 'Total_Cost':
-        plt.ylim(0, 3e9)
-    elif column_name == 'Avg_Subsidy_Amount':
-        plt.ylim(0, 3e5)
-    elif column_name == 'Avg_TC':
-        plt.ylim(0, 1e6)
+        plt.ylim(0, 0.12)
+    elif column_name == 'Total_Subsidy':
+        plt.ylim(0, 4e9)
+    elif column_name == 'Avg_Subsidy':
+        plt.ylim(0, 4e5)
 
     for i, value in enumerate(value_list):
         plt.text(i + 1, value, str('%0.2e' % value), ha='center', va='bottom')
     plt.show()
 
-
 # mhi_analysis_visualization(mhi_result_opt, 'Total_Relocation_Num')
 # mhi_analysis_visualization(mhi_result_opt, 'Percent_Relocation')
-# mhi_analysis_visualization(mhi_result_opt, 'Total_Subsidy_Amount')
-# mhi_analysis_visualization(mhi_result_opt, 'Total_Cost')
-# mhi_analysis_visualization(mhi_result_opt, 'Avg_Subsidy_Amount')
-# mhi_analysis_visualization(mhi_result_opt, 'Avg_TC')
+# mhi_analysis_visualization(mhi_result_opt, 'Total_Subsidy')
+# mhi_analysis_visualization(mhi_result_opt, 'Avg_Subsidy')
 
 def Relocation_year_each_mhi(mhi_result, colname, calLength):
     mhi_list = list(mhi_result.iloc[:, 0])

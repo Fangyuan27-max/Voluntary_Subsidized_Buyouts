@@ -55,11 +55,11 @@ if __name__ == '__main__':
     print("Time used to create the resident list,", endtime1 - starttime1)
 
     # select the percentage for fixed subsidy without optimization, given that we are not able to judge the
-    # perlist = list(np.arange(0.1, 0.51, 0.01))
-    # result, selected_per = selecting_percentage(perlist, resList, calLength, disMethodGov, disRateGov, disAlphaGov)
+    # perlist = list(np.arange(0.1, 0.61, 0.1))
+    # result, selected_per = selecting_percentage(perlist, resList, calLength, decLength, totalLength, disMethodGov, disRateGov, disAlphaGov)
     # print("The selected fixed percentage:", selected_per)
 
-    # simualtion for 1 and 2
+    # # simualtion for 1 and 2
     selected_per = 0.5 # the final selected percentage
     subPercent = selected_per
     Gov = Class_Gov.government(disMethodGov, disRateGov, disAlphaGov)
@@ -70,7 +70,7 @@ if __name__ == '__main__':
 
     # simulation for 3
     starttime3 = time.time()
-    Gov = Run_W_Optimization(Gov, resList, calLength, decLength)
+    Gov = Run_W_Optimization(Gov, resList, calLength, decLength, totalLength)
     endtime3 = time.time()
     print("Time used to run simulation optimization,", endtime3 - starttime3)
 
