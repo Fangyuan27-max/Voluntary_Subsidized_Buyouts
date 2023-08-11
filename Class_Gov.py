@@ -51,18 +51,12 @@ class government:
             else:
                 self.objective_fixed_subsidy += self.pastloss[res.idx][totalLength - 1]
 
-            if res.optmotiMoveYear < calLength and res.optmotiMoveYear == res.selfMoveYear:
-                self.objective_optimize_individually += self.pastloss[res.idx][res.selfMoveYear]
-            elif res.optmotiMoveYear < calLength and res.optmotiMoveYear < res.selfMoveYear:
-                self.objective_optimize_individually += self.pastloss[res.idx][res.motiMoveYear] + res.Subsidyneeded[res.optmotiMoveYear] /((1 + self.disRate)**res.optmotiMoveYear)
-            else:
-                self.objective_optimize_individually += self.pastloss[res.idx][totalLength - 1]
     def calculating_objective_W_Optimization(self, residents, calLength, totalLength):
         for res in residents:
             if res.optmotiMoveYear < calLength and res.optmotiMoveYear == res.selfMoveYear:
                 self.objective_optimize_individually += self.pastloss[res.idx][res.selfMoveYear]
             elif res.optmotiMoveYear < calLength and res.optmotiMoveYear < res.selfMoveYear:
-                self.objective_optimize_individually += self.pastloss[res.idx][res.motiMoveYear] + res.Subsidyneeded[res.optmotiMoveYear] /((1 + self.disRate)**res.optmotiMoveYear)
+                self.objective_optimize_individually += self.pastloss[res.idx][res.optmotiMoveYear] + res.Subsidyneeded[res.optmotiMoveYear] /((1 + self.disRate)**res.optmotiMoveYear)
             else:
                 self.objective_optimize_individually += self.pastloss[res.idx][totalLength - 1]
 

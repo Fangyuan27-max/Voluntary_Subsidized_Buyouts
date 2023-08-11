@@ -60,7 +60,8 @@ def Run_W_Optimization(gov, resList, calLength, decLength, totalLength):
     else:
         print("The discounting method should be either Exponential or Hyperbolic")
 
-    gov.calculating_objective_W_optimization(resList, calLength, totalLength)
+    gov.calculating_objective_W_Optimization(resList, calLength, totalLength)
+
     return gov
 
 
