@@ -93,7 +93,7 @@ def EAD_Discounting_Cost(gov, resList, calLength, decLength, totalLength):
                     Self_EAD += res.ead[i] / ((1 + gov.disRate) ** i)
                 else:
                     Self_EAD += 0
-                # compared with "No Relocation", the EAD reduction is the sum of NPV(in year 0) of EAD from the self-relocation year to the year 50.
+                # compared with "No Relocation", the EAD reduction is the sum of NPV(in year 0) of EAD in the next 30 years.
                 if i == res.selfMoveYear:
                     EAD_Reduction_SR_NoRelocation += sum([discount(res.ead[j], gov.disRate, j) for j in range(i, i + decLength)])
                 # since under the self-move mode, the government will not provide any subsidy but bear the flood loss, the subsidy and totalcost will be 0
@@ -108,7 +108,7 @@ def EAD_Discounting_Cost(gov, resList, calLength, decLength, totalLength):
                 # calculate the ead reduction and cost
                 if i == res.motiMoveYear:
                     # if the resident will relocate in any year before year 21, the EAD reduction is the sum of npv of ead between motivated_year and self_year, else
-                    # the reduction is between the motivated relocation year and year 50
+                    # the reduction is between the motivated relocation year and the following 30 years
                     if res.selfMoveYear < calLength:
                         EAD_Reduction_FS_SR += sum([res.ead[j] / (1 + gov.disRate) ** j for j in range(i, res.selfMoveYear)])
                     else:

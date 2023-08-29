@@ -49,7 +49,7 @@ def Run_W_Optimization(gov, resList, calLength, decLength, totalLength):
                 else:
                     EAD_reduction = sum([res.ead[i] / (1 + gov.disRate) ** (i - moveYear_Optimize) for i in range(moveYear_Optimize + decLength)])
 
-                if EAD_reduction >= cost:
+                if EAD_reduction >= cost and not (moveYear_Optimize == res.selfMoveYear):
                     res.optmotiMoveYear = moveYear_Optimize
                     res.optimotiFlag = 1
                 else:
