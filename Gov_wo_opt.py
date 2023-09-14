@@ -6,7 +6,11 @@ def ResRun_WO_Optimization(gov, resList, subPercent, calLength, decLength, total
             # check if the resident has moved out
             if res.selfMoveFlag:
                 break
-            if not res.selfMoveFlag and res.FutureLoss[year] >= res.replacementcost + res.relocationcost:
+            # the original version
+            # if not res.selfMoveFlag and res.FutureLoss[year] >= res.replacementcost + res.relocationcost:
+
+            # the revised version
+            if not res.selfMoveFlag and round(res.FutureLoss[year]/1e4, 1) >= round(res.replacementcost/1e4, 1):
                 res.selfMoveFlag = 1
                 res.selfMoveYear = year
 
@@ -16,13 +20,22 @@ def ResRun_WO_Optimization(gov, resList, subPercent, calLength, decLength, total
             # check if the resident has moved out
             if res.motiMoveFlag:
                 break
-            if not res.motiMoveFlag and res.FutureLoss[year] + res.replacementcost*subPercent >= res.replacementcost + res.relocationcost:
+
+            # the original version
+            # if not res.motiMoveFlag and res.FutureLoss[year] + res.replacementcost * subPercent >= res.replacementcost + res.relocationcost:
+            # the revised version
+            if not res.motiMoveFlag and round((res.FutureLoss[year] + res.replacementcost*subPercent)/1e4, 1) >= round(res.replacementcost/1e4, 1):
                 # check the b/c of such a relocation, compare the EAD reduction with the total cost
-                cost = res.replacementcost*subPercent
+                # the original expression
+                # cost = res.replacementcost*subPercent
+                # the new expression
+                cost = round((res.replacementcost*subPercent + res.relocationcost)/1e4, 1)
+                # cost = res.replacementcost*subPercent + res.replacementcost + res.relocationcost
                 # exponential discounting - discount the ead reduction using government's discount rate
                 if gov.disMethod == "Exponential":
                     if res.selfMoveYear < calLength:
-                        EAD_reduction_gov = sum([res.ead[i] / (1 + gov.disRate) ** (i - year) for i in range(year, res.selfMoveYear)])
+                        EAD_reduction_gov = sum(
+                            [res.ead[i] / (1 + gov.disRate) ** (i - year) for i in range(year, res.selfMoveYear)])
                     else:
                         EAD_reduction_gov = sum([res.ead[i] / (1 + gov.disRate) ** (i - year) for i in range(year, year + decLength)])
 
@@ -33,6 +46,10 @@ def ResRun_WO_Optimization(gov, resList, subPercent, calLength, decLength, total
                     else:
                         EAD_reduction_gov = sum([res.ead[i] / (1 + gov.alpha * (i - year)) for i in range(year, year + decLength)])
 
+                EAD_reduction_gov = round(EAD_reduction_gov/1e4, 1)
+                # the original version
+                # if EAD_reduction_gov >= cost:
+                # the revised version
                 if EAD_reduction_gov >= cost:
                     res.motiMoveFlag = 1
                     res.motiMoveYear = year
@@ -42,25 +59,8 @@ def ResRun_WO_Optimization(gov, resList, subPercent, calLength, decLength, total
                     res.motiMoveFlag = 0
 
     gov.discountedPastLoss(resList, totalLength)
-    gov.calculating_objective_WO_Optimization(subPercent, resList, calLength, totalLength)
 
     return gov, resList
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

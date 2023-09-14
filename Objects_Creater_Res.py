@@ -9,7 +9,8 @@ def CreateRes(resident_info, ead_info, colname, startcol,  disMethod, disRate, a
             continue
 
         # else, read the ead data from year 0 to year 50, store as a list
-        eadlist = ead_info.loc[ead_info[colname] == res[colname]].values.tolist()[0][startcol:]
+        start_index = ead_info.columns.get_loc(startcol)
+        eadlist = ead_info.loc[ead_info[colname] == res[colname]].values.tolist()[0][start_index:]
 
         replacement_cost = int(res['replacement_cost'])
         relocation_cost = int(res['relocation_cost'])
@@ -20,7 +21,6 @@ def CreateRes(resident_info, ead_info, colname, startcol,  disMethod, disRate, a
         # calculate the expected future loss and determine when to relocate for every resident
         res_list.append(resident)
     return res_list
-
 
 
 
