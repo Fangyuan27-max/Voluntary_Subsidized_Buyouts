@@ -29,9 +29,9 @@ if __name__ == '__main__':
         resident_info = resident_info_copy
         ead_filename = 'landscape' + str(landscape) + '_fragility1.0_pumping0.5.csv'
         ead_info_new = pd.read_csv(ead_filename)
-        # ead_info_new = ead_info[ead_info['landscape_scenario_id'] == landscape]
-        # ead_info_new = ead_info_new.drop(columns=['landscape_scenario_id'])
-        merged_df = resident_info.merge(ead_info_new, on='structure_id', how='inner', validate = '1:1')
+        ead_info_new = ead_info_new.drop(columns = ['Unnamed: 0'])
+        merged_df = resident_info.merge(ead_info_new, on='structure_id', how='left', validate='1:1')
+        merged_df.fillna(0)
 
         resident_info = merged_df[['structure_id', 'replacement_cost', 'relocation_cost', 'mhi_ratio']]
         ead_info_new = merged_df.drop(['replacement_cost', 'relocation_cost', 'mhi_ratio'], axis=1)
