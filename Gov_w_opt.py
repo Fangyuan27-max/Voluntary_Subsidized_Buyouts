@@ -17,27 +17,24 @@ def Run_W_Optimization(gov, resList, calLength, decLength):
             moveYear_Optimize = gov.NPVlossSubsidy[res.idx].index(min(gov.NPVlossSubsidy[res.idx]))
             # check if the relocation satisfies the condition that B/C are greater than 1
             # if the minimum occurs at the 20th year, it might not be a global minimum and we assume the resident will not conduct motivated move
-            if moveYear_Optimize == calLength - 1:
-                res.optmotiMoveYear = 100
+            cost = round((res.Subsidyneeded[moveYear_Optimize] + res.relocationcost) / 1e4, 1)
+            # cost = res.replacementcost + res.relocationcost + res.Subsidyneeded[moveYear_Optimize]
+            if res.selfMoveYear < calLength:
+                EAD_reduction = sum(
+                    [res.ead[i] / (1 + gov.disRate) ** (i - moveYear_Optimize) for i in
+                     range(moveYear_Optimize, res.selfMoveYear)])
             else:
-                # old version
-                # cost = res.Subsidyneeded[moveYear_Optimize]
-                # new version
-                cost = round((res.Subsidyneeded[moveYear_Optimize] + res.relocationcost)/1e4, 1)
-                # cost = res.replacementcost + res.relocationcost + res.Subsidyneeded[moveYear_Optimize]
-                if res.selfMoveYear < calLength:
-                    EAD_reduction = sum(
-                        [res.ead[i] / (1 + gov.disRate) ** (i - moveYear_Optimize) for i in range(moveYear_Optimize, res.selfMoveYear)])
-                else:
-                    EAD_reduction = sum([res.ead[i] / (1 + gov.disRate) ** (i - moveYear_Optimize) for i in range(moveYear_Optimize, moveYear_Optimize + decLength)])
+                EAD_reduction = sum([res.ead[i] / (1 + gov.disRate) ** (i - moveYear_Optimize) for i in
+                                     range(moveYear_Optimize, moveYear_Optimize + decLength)])
 
-                EAD_reduction = round(EAD_reduction/1e4, 1)
-                if EAD_reduction >= cost and not (moveYear_Optimize == res.selfMoveYear) and res.Subsidyneeded[moveYear_Optimize] != 0:
-                    res.optmotiMoveYear = moveYear_Optimize
-                    res.optimotiFlag = 1
-                else:
-                    res.optmotiMoveYear = res.selfMoveYear
-                    res.optimotiFlag = 0
+            EAD_reduction = round(EAD_reduction / 1e4, 1)
+            if EAD_reduction >= cost and (moveYear_Optimize != res.selfMoveYear) and res.Subsidyneeded[
+                moveYear_Optimize] != 0:
+                res.optmotiMoveYear = moveYear_Optimize
+                res.optimotiFlag = 1
+            else:
+                res.optmotiMoveYear = res.selfMoveYear
+                res.optimotiFlag = 0
             gov.Subsidyyear[res.idx] = res.optmotiMoveYear
 
     elif gov.disMethod == 'Hyperbolic':
