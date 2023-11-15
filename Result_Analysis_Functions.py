@@ -64,6 +64,7 @@ def discount(value, dr, length):
 def EAD_Discounting_Cost(gov, resList, calLength, decLength, totalLength):
     benefit_cost_year = {}
     benefit_cost_year['Year'] = []
+    benefit_cost_year['Original_EAD'] = []
     benefit_cost_year['Self_EAD'] = []
     benefit_cost_year['Self_Subsidy'] = []
     benefit_cost_year['Self_TC'] = []
@@ -79,14 +80,19 @@ def EAD_Discounting_Cost(gov, resList, calLength, decLength, totalLength):
 
     for i in range(totalLength):
         benefit_cost_year['Year'].append(i)
+        Original_EAD = 0
         Self_EAD, Self_Subsidy, Self_TC = 0, 0, 0
         Moti_EAD, Moti_Subsidy, Moti_TC = 0, 0, 0
         Opt_Moti_EAD, Opt_Moti_Subsidy, Opt_Moti_TC = 0, 0, 0
         EAD_Reduction_SR_NoRelocation, EAD_Reduction_FS_SR, EAD_Reduction_OS_SR = 0, 0, 0
 
+        # obtain the original ead value of all residents
+        for res in resList:
+            Original_EAD += res.ead[i] / ((1 + gov.disRate) ** i)
+
         if i < calLength:
             for res in resList:
-                ## calculate the benefit and cost of self-move
+               ## calculate the benefit and cost of self-move
                 # for a given year, if the resident does not relocate, its EAD contributes to the EAD loss that gov bears this year
                 if i < res.selfMoveYear:
                     Self_EAD += res.ead[i] / ((1 + gov.disRate) ** i)
@@ -163,6 +169,7 @@ def EAD_Discounting_Cost(gov, resList, calLength, decLength, totalLength):
                     Opt_Moti_EAD += 0
 
         benefit_cost_year['EAD_Reduction_SR_NoRelocation'].append(EAD_Reduction_SR_NoRelocation)
+        benefit_cost_year['Original_EAD'].append(Original_EAD)
         benefit_cost_year['Self_EAD'].append(Self_EAD)
         benefit_cost_year['Self_Subsidy'].append(Self_Subsidy)
         benefit_cost_year['Self_TC'].append(Self_TC)
@@ -178,6 +185,25 @@ def EAD_Discounting_Cost(gov, resList, calLength, decLength, totalLength):
     benefit_cost_result = pd.DataFrame(benefit_cost_year)
     return benefit_cost_result
 
+def Relocation_Outcome(resList, selected_per, landscape):
+    resident_outcome = []
+    for res in resList:
+        res_info = {}
+        res_info['structure_id'] = res.idx
+        res_info['RC1'] = res.replacementcost
+        res_info['RC2'] = res.relocationcost
+        res_info['mhi'] = res.mhi_ratio
+        res_info['self_year'] = res.selfMoveYear
+        res_info['fixed_year'] = res.motiMoveYear
+        res_info['optimal_year'] = res.optmotiMoveYear
+        res_info['fixed_flag'] = (1 if res.motiMoveFlag == 1 else 0)
+        res_info['fixed_subsidy'] = (res.replacementcost * selected_per if res.motiMoveFlag == 1 else 0)
+        res_info['optimal_flag'] = (1 if res.optimotiFlag == 1 else 0)
+        res_info['optimal_subsidy'] = (res.Subsidyneeded[res.optmotiMoveYear] if res.optimotiFlag == 1 else 0)
+
+        resident_outcome.append(res_info)
+    resident_outcome = pd.DataFrame(resident_outcome)
+    return resident_outcome
 def analysis_mhi(gov, resList, mhi_list, mode, subPercent, calLength):
     mhi_result = {}
     for mhi in mhi_list:
@@ -206,7 +232,7 @@ def analysis_mhi(gov, resList, mhi_list, mode, subPercent, calLength):
                             mhi_result[mhi]['Total_Subsidy_Amount'] += res.Subsidyneeded[res.optmotiMoveYear]/(1 + gov.disRate)**res.optmotiMoveYear
                             mhi_result[mhi]['Total_Cost'] += (res.Subsidyneeded[res.optmotiMoveYear] + res.relocationcost) / (1 + gov.disRate) ** res.optmotiMoveYear
                             # mhi_result[mhi]['Total_Cost'] += (res.Subsidyneeded[res.optmotiMoveYear] + res.replacementcost + res.relocationcost)/(1 + gov.disRate)**res.optmotiMoveYear
-            mhi_result[mhi]['Percent_Relocation'] = mhi_result[mhi]['Total_Relocation_Num'] / mhi_number
+            mhi_result[mhi]['Percent_Relocation'] = mhi_result[mhi]['Total_Relocation_Num'] / (mhi_number+1)
             mhi_result[mhi]['Avg_Subsidy_Amount'] = mhi_result[mhi]['Total_Subsidy_Amount'] / (motivated_relocation_num + 1)
             mhi_result[mhi]['Avg_TC'] = mhi_result[mhi]['Total_Cost'] / (motivated_relocation_num + 1)
 
@@ -226,7 +252,7 @@ def analysis_mhi(gov, resList, mhi_list, mode, subPercent, calLength):
                             mhi_result[mhi]['Total_Cost'] += (res.replacementcost * subPercent + res.relocationcost) / (1 + gov.disRate) ** res.optmotiMoveYear
                             # mhi_result[mhi]['Total_Cost'] += (res.replacementcost * (1 + subPercent) + res.relocationcost)/(1 + gov.disRate)**res.motiMoveYear
 
-            mhi_result[mhi]['Percent_Relocation'] = mhi_result[mhi]['Total_Relocation_Num'] / mhi_number
+            mhi_result[mhi]['Percent_Relocation'] = mhi_result[mhi]['Total_Relocation_Num'] / (mhi_number+1)
             mhi_result[mhi]['Avg_Subsidy_Amount'] = mhi_result[mhi]['Total_Subsidy_Amount'] / (motivated_relocation_num + 1)
             mhi_result[mhi]['Avg_TC'] = mhi_result[mhi]['Total_Cost'] / (motivated_relocation_num + 1)
     else:
@@ -241,74 +267,10 @@ def analysis_mhi(gov, resList, mhi_list, mode, subPercent, calLength):
                         mhi_result[mhi]['Total_Cost'] += res.relocationcost/(1 + gov.disRate)**res.selfMoveYear
                         mhi_result[mhi]['Relocation_Year'].append(res.motiMoveYear)
 
-            mhi_result[mhi]['Percent_Relocation'] = mhi_result[mhi]['Total_Relocation_Num'] / mhi_number
+            mhi_result[mhi]['Percent_Relocation'] = mhi_result[mhi]['Total_Relocation_Num'] / (mhi_number+1)
             mhi_result[mhi]['Avg_Subsidy_Amount'] = 0
             mhi_result[mhi]['Avg_TC'] = mhi_result[mhi]['Total_Cost'] / (mhi_result[mhi]['Total_Relocation_Num'] + 1)
 
     mhi_result_output = pd.DataFrame(mhi_result).T
     return mhi_result_output
 
-def Relocated_Residents(gov, resList):
-    Self_relocation = {}
-    Self_relocation['Structure_id'] = []
-    Self_relocation['Relocation_year'] = []
-
-    Fixed_relocation = {}
-    Fixed_relocation['Structure_id'] = []
-    Fixed_relocation['Replacement_cost'] = []
-    Fixed_relocation['Relocation_cost'] = []
-    Fixed_relocation['Self_Relocation_year'] = []
-    Fixed_relocation['Fix_Relocation_year'] = []
-    Fixed_relocation['Fix_Motivated_Or_Not'] = []
-    Fixed_relocation['Fix_Subsidy'] = []
-    Fixed_relocation['Fix_Subsidy_Discounted'] = []
-    Fixed_relocation['Fix_EAD_Reduction'] = []
-
-    Optimal_relocation = {}
-    Optimal_relocation['Structure_id'] = []
-    Optimal_relocation['Replacement_cost'] = []
-    Optimal_relocation['Relocation_cost'] = []
-    Optimal_relocation['Self_Relocation_year'] = []
-    Optimal_relocation['Opt_Relocation_year'] = []
-    Optimal_relocation['Opt_Motivated_Or_Not'] = []
-    Optimal_relocation['Opt_Subsidy'] = []
-    Optimal_relocation['Opt_Subsidy_Discounted'] = []
-    Optimal_relocation['Opt_EAD_Reduction'] = []
-
-    for res in resList:
-        if res.selfMoveFlag == True:
-            Self_relocation['Structure_id'].append(res.idx)
-            Self_relocation['Relocation_year'].append(res.selfMoveYear)
-
-        if res.motiMoveFlag == True:
-            Fixed_relocation['Structure_id'].append(res.idx)
-            Fixed_relocation['Replacement_cost'].append(res.replacementcost)
-            Fixed_relocation['Relocation_cost'].append(res.relocationcost)
-            Fixed_relocation['Self_Relocation_year'].append(res.selfMoveYear)
-            Fixed_relocation['Fix_Relocation_year'].append(res.motiMoveYear)
-            Fixed_relocation['Fix_Motivated_Or_Not'].append(0 if res.selfMoveYear == res.motiMoveYear else 1)
-            Fixed_relocation['Fix_Subsidy'].append(res.replacementcost * 0.5)
-            Fixed_relocation['Fix_Subsidy_Discounted'].append((res.replacementcost * 0.5) / (1 + gov.disRate) ** res.motiMoveYear)
-
-            Fixed_relocation['Fix_EAD_Reduction'].append(0 if res.selfMoveYear == res.motiMoveYear else sum([res.ead[i]/(1 + gov.disRate)**i
-                                                                                                             for i in range(res.motiMoveYear,
-                                                                                                                            res.selfMoveYear if res.selfMoveYear < 21 else res.motiMoveYear + 30,
-                                                                                                                            1)]))
-        elif res.optimotiFlag == True:
-            Optimal_relocation['Structure_id'].append(res.idx)
-            Optimal_relocation['Replacement_cost'].append(res.replacementcost)
-            Optimal_relocation['Relocation_cost'].append(res.relocationcost)
-            Optimal_relocation['Self_Relocation_year'].append(res.selfMoveYear)
-            Optimal_relocation['Opt_Relocation_year'].append(res.optmotiMoveYear)
-            Optimal_relocation['Opt_Motivated_Or_Not'].append(0 if res.selfMoveYear == res.optmotiMoveYear else 1)
-            Optimal_relocation['Opt_Subsidy'].append(res.Subsidyneeded[res.optmotiMoveYear])
-            Optimal_relocation['Opt_Subsidy_Discounted'].append((res.Subsidyneeded[res.optmotiMoveYear]) / (1 + gov.disRate) ** res.optmotiMoveYear)
-            Optimal_relocation['Opt_EAD_Reduction'].append(0 if res.selfMoveYear == res.optmotiMoveYear else sum([res.ead[i]/(1 + gov.disRate)**i
-                                                                                                                  for i in range(res.optmotiMoveYear,
-                                                                                                                                 res.selfMoveYear if res.selfMoveYear < 21 else res.optmotiMoveYear + 30,
-                                                                                                                                 1)]))
-
-    Self_relocation_DF = pd.DataFrame(Self_relocation)
-    Fixed_relocation_DF = pd.DataFrame(Fixed_relocation)
-    Optimal_relocation_DF = pd.DataFrame(Optimal_relocation)
-    return Self_relocation_DF, Fixed_relocation_DF,Optimal_relocation_DF

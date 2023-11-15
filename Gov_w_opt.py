@@ -37,6 +37,29 @@ def Run_W_Optimization(gov, resList, calLength, decLength):
                 res.optimotiFlag = 0
             gov.Subsidyyear[res.idx] = res.optmotiMoveYear
 
+            # if moveYear_Optimize == calLength - 1:
+            #     res.optmotiMoveYear = 100
+            # else:
+            #     # old version
+            #     # cost = res.Subsidyneeded[moveYear_Optimize]
+            #     # new version
+            #     cost = round((res.Subsidyneeded[moveYear_Optimize] + res.relocationcost)/1e4, 1)
+            #     # cost = res.replacementcost + res.relocationcost + res.Subsidyneeded[moveYear_Optimize]
+            #     if res.selfMoveYear < calLength:
+            #         EAD_reduction = sum(
+            #             [res.ead[i] / (1 + gov.disRate) ** (i - moveYear_Optimize) for i in range(moveYear_Optimize, res.selfMoveYear)])
+            #     else:
+            #         EAD_reduction = sum([res.ead[i] / (1 + gov.disRate) ** (i - moveYear_Optimize) for i in range(moveYear_Optimize, moveYear_Optimize + decLength)])
+            #
+            #     EAD_reduction = round(EAD_reduction/1e4, 1)
+            #     if EAD_reduction >= cost and (moveYear_Optimize != res.selfMoveYear) and res.Subsidyneeded[moveYear_Optimize] != 0:
+            #         res.optmotiMoveYear = moveYear_Optimize
+            #         res.optimotiFlag = 1
+            #     else:
+            #         res.optmotiMoveYear = res.selfMoveYear
+            #         res.optimotiFlag = 0
+            # gov.Subsidyyear[res.idx] = res.optmotiMoveYear
+
     elif gov.disMethod == 'Hyperbolic':
         for res in resList:
             NPVsum = []

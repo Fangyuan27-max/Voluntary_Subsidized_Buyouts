@@ -8,9 +8,12 @@ def CreateRes(resident_info, ead_info, colname, startcol,  disMethod, disRate, a
         if index == 0:
             continue
 
+        # print('id', res[colname])
+
         # else, read the ead data from year 0 to year 50, store as a list
         start_index = ead_info.columns.get_loc(startcol)
         eadlist = ead_info.loc[ead_info[colname] == res[colname]].values.tolist()[0][start_index:]
+        # print(eadlist)
 
         replacement_cost = int(res['replacement_cost'])
         relocation_cost = int(res['relocation_cost'])

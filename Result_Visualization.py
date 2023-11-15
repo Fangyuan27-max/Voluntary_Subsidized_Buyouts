@@ -3,21 +3,21 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
-num_file_path = 'Relocation_num_each_year_8_gov3_res12.csv'
-adoption_rate_path = 'Adoption_rate_8_gov3_res12.csv'
-EAD_Cost_Discounting_path = 'EADReduction_Cost_8_gov3_res12.csv'
-Fixed_Relocation_Residents_path = 'Fixed_Relocated_Residents_8_gov3_res12.csv'
-Optimal_Relocation_Residents_path = 'Optimal_Relocated_Residents_7_gov3_res12.csv'
+landscape = 7
+data_path = './Results' + str(landscape) + '/'
+num_file_path = data_path + 'Relocation_num_each_year_' + str(landscape) + '_gov3_res12.csv'
+adoption_rate_path = data_path + 'Adoption_rate_' + str(landscape) + '_gov3_res12.csv'
+EAD_Cost_Discounting_path = data_path + 'EADReduction_Cost_' + str(landscape) + '_gov3_res12.csv'
+Relocation_outcome_path = data_path + 'Relocation_Outcome_Landscape' + str(landscape) + '.csv'
 
 Relocation_num = pd.read_csv(num_file_path)
 Adoption_rate = pd.read_csv(adoption_rate_path)
 EAD_Cost_Discounting = pd.read_csv(EAD_Cost_Discounting_path)
-Fixed_Relocation_Residents = pd.read_csv(Fixed_Relocation_Residents_path)
-Optimal_Relocation_Residents = pd.read_csv(Optimal_Relocation_Residents_path)
+Relocation_Outcome = pd.read_csv(Relocation_outcome_path)
 
-mhi_result_self_path = 'mhi_result_self_8_gov3_res12.csv'
-mhi_result_fix_path = 'mhi_result_fix_8_gov3_res12.csv'
-mhi_result_opt_path = 'mhi_result_opt_8_gov3_res12.csv'
+mhi_result_self_path = data_path + 'mhi_result_self_' + str(landscape) + '_gov3_res12.csv'
+mhi_result_fix_path = data_path + 'mhi_result_fix_' + str(landscape) + '_gov3_res12.csv'
+mhi_result_opt_path = data_path + 'mhi_result_opt_' + str(landscape) + '_gov3_res12.csv'
 
 mhi_result_self = pd.read_csv(mhi_result_self_path)
 mhi_result_fix = pd.read_csv(mhi_result_fix_path)
@@ -72,11 +72,147 @@ def Bar_relocation(Relocation_num, calLength):
     plt.title('The relocation number each year under three relocation modes')
     plt.legend()
     plt.xticks(x2)
+    plt.ylim(0, 4e4)
     plt.show()
 
 
-Bar_relocation(Relocation_num, 20)
+# Bar_relocation(Relocation_num, 20)
 
+# Showing the Accumulative relocation number
+# the first step is to learn the relocation components in each year, the total number, self-relocation num, and motivated num
+
+def Construct_Cumulative_Num(Relocation_Outcome):
+    # unify the flag
+    Relocation_Outcome.replace({True: 1, 'False': 0, '0': 0, '1': 1}, inplace=True)
+    # print(Relocation_Outcome['fixed_flag'].unique())
+    yearlist = list(np.arange(0, 20, 1))
+    Fixed_Self = []
+    Fixed_Motivated = []
+    Optimal_Self = []
+    Optimal_Motivated = []
+    for year in yearlist:
+        # obtain the fixed data
+        Fixed_df = Relocation_Outcome[Relocation_Outcome['fixed_year'] == year]
+        Fixed_Self.append(Fixed_df[Fixed_df['fixed_flag'] == 0].shape[0])
+        Fixed_Motivated.append(Fixed_df[Fixed_df['fixed_flag'] == 1].shape[0])
+        # obtain the optimal data
+        Optimal_df = Relocation_Outcome[Relocation_Outcome['optimal_year'] == year]
+        Optimal_Self.append(Optimal_df[Optimal_df['optimal_flag'] == 0].shape[0])
+        Optimal_Motivated.append(Optimal_df[Optimal_df['optimal_flag'] == 1].shape[0])
+    return Fixed_Self, Fixed_Motivated, Optimal_Self, Optimal_Motivated
+
+
+# Define Colors
+colors = {
+    'darkblue': '#004488',
+    'lightblue': '#47abd8',
+    'darkred': '#BB5566',
+    'lightred': '#febdbb'
+}
+
+
+def Cumulative_Relocation_num(Self, Motivated, yearlist, label1, label2, color1, color2, title):
+    # make
+    x = yearlist
+    y1 = np.array(Self)
+    y2 = np.array(Motivated)
+    y3 = y1 + y2
+
+    self_relocation = y1.cumsum()
+    motivated_relocation = y3.cumsum()
+
+    bar_width = 0.2  # the width of the bars
+    width = 0.22
+
+    # Bar Plot - every year
+    fig = plt.plot()
+    # fig, ax = plt.subplots(figsize=(10, 6))
+
+    # plot the accumulated relocation number
+
+    plt.plot(x, self_relocation, label=label1, color=colors[color1], marker='o')
+    plt.plot(x, motivated_relocation, label=label2, color=colors[color2], marker='D')
+
+    # Labeling, Legend etc.
+    plt.xlabel('Years')
+    plt.ylabel('Cumulative Relocation')
+    plt.title(title)
+    plt.xticks([h for h in x])  # Center the x-ticks between the two bars
+    plt.legend(loc='upper left')
+
+    # Display Plot
+    plt.xlim(left=0)
+    plt.ylim(0, 50000)
+    plt.tight_layout()
+    plt.show()
+
+
+yearlist = list(np.arange(0, 20, 1))
+Fixed_Self, Fixed_Motivated, Optimal_Self, Optimal_Motivated = Construct_Cumulative_Num(Relocation_Outcome)
+
+
+# # print(Fixed_Self, Fixed_Motivated, Optimal_Self, Optimal_Motivated)
+# Cumulative_Relocation_num(Fixed_Self, Fixed_Motivated, yearlist, "Self-Relocations (Fixed Subsidy)", "Total-Relocations (Fixed Subsidy)",
+#                           'yellow', 'darkblue', "Accumulated Relocation of Fixed Subsidy Plan, Higher Scenario")
+# Cumulative_Relocation_num(Optimal_Self, Optimal_Motivated, yearlist, "Self-Relocations (Optimal Subsidy)", "Total-Relocations (Optimal Subsidy)",
+#                           'yellow', 'darkred', "Accumulated Relocation of Optimal Subsidy Plan, Higher Scenario")
+
+def Cumulative_Relocation_In_One_Figure(Fixed_Self, Fixed_Motivated, Optimal_Self, Optimal_Motivated, yearlist, label1,
+                                        label2, label3, label4, color1, color2, color3, color4, title):
+    x = yearlist
+    y1 = np.array(Fixed_Self)
+    y2 = np.array(Fixed_Motivated)
+    y3 = np.array(Optimal_Self)
+    y4 = np.array(Optimal_Motivated)
+
+    y5 = y1 + y2
+    y6 = y3 + y4
+
+    fixed_self_relocation = y1.cumsum()
+    fixed_motivated_relocation = y5.cumsum()
+
+    opt_self_relocation = y3.cumsum()
+    opt_motivated_relocation = y6.cumsum()
+
+    # Bar Plot - every year
+    # fig = plt.plot()
+    plt.figure(figsize=(8, 6))
+    # fig, ax = plt.subplots(figsize=(10, 6))
+
+    # plot the accumulated relocation number
+
+    plt.plot(x, fixed_self_relocation, label=label1, color=colors[color1], marker='P')
+    plt.plot(x, fixed_motivated_relocation, label=label2, color=colors[color2], marker='P')
+    plt.plot(x, opt_self_relocation, label=label3, color=colors[color3], marker='o')
+    plt.plot(x, opt_motivated_relocation, label=label4, color=colors[color4], marker='o')
+
+    # Labeling, Legend etc.
+    plt.xlabel('Year', fontsize=16)
+    plt.ylabel('Cumulative Relocations', fontsize=16)
+    plt.title(title, fontsize=20)
+    plt.xticks([h for h in x], fontsize=16)  # Center the x-ticks between the two bars
+    plt.yticks(fontsize=16)
+    plt.legend(loc='upper left', fontsize=14, handlelength=1)
+
+    plt.tick_params(axis='both',  # Apply to both x and y axes
+                    which='both',  # Apply to both major and minor ticks
+                    direction='in',  # 'in' for ticks pointing inwards
+                    bottom=True,  # Apply changes to the bottom axis
+                    top=False,  # Apply changes to the top axis
+                    left=True,  # Apply changes to the left axis
+                    right=False)
+
+    # Display Plot
+    plt.xlim(left=0)
+    plt.ylim(0, 60000)
+    plt.tight_layout()
+
+    plt.show()
+
+
+# Cumulative_Relocation_In_One_Figure(Fixed_Self, Fixed_Motivated, Optimal_Self, Optimal_Motivated,yearlist,
+#                                     "Self Relocations | Fixed Subsidy", "Total Relocations | Fixed Subsidy", "Self Relocations | Optimal Subsidy",
+#                                     "Total Relocations | Optimal Subsidy",'lightblue', 'darkblue','lightred', 'darkred', 'Lower Scenario')
 
 # A function to plot the stack line chart of the adoption rate
 def Line_adoption(Adoption, calLength):
@@ -105,8 +241,7 @@ def Line_adoption(Adoption, calLength):
     plt.show()
 
 
-Line_adoption(Adoption_rate, 20)
-
+# Line_adoption(Adoption_rate, 19)
 
 # A function to plot the EAD(bar chart) and benefit/cost ratio(line chart) simultaneously
 def Bar_EAD_Line_BC(Benefit_cost, calLength):
@@ -147,8 +282,8 @@ def Bar_EAD_Line_BC(Benefit_cost, calLength):
     BC_opt_moti = []
     # calculate the benefit/cost ratio
     for i in range(len(x1) - 1):
-        BC_fix_moti.append(min(fixed_reduced_EAD[i] / fixmoti_TC[i], 5))
-        BC_opt_moti.append(min(opt_reduced_EAD[i] / optmoti_TC[i], 5))
+        BC_fix_moti.append(min(fixed_reduced_EAD[i] / (1 + fixmoti_TC[i]), 5))
+        BC_opt_moti.append(min(opt_reduced_EAD[i] / (1 + optmoti_TC[i]), 5))
 
     fig, ax1 = plt.subplots()
     bar_width = 5 / 4
@@ -170,8 +305,7 @@ def Bar_EAD_Line_BC(Benefit_cost, calLength):
     plt.show()
 
 
-Bar_EAD_Line_BC(EAD_Cost_Discounting, 20)
-
+# Bar_EAD_Line_BC(EAD_Cost_Discounting, 20)
 
 def Bar_EAD_Line_BC_Each_Year(Benefit_cost):
     x = Benefit_cost['Year']
@@ -208,8 +342,110 @@ def Bar_EAD_Line_BC_Each_Year(Benefit_cost):
     plt.show()
 
 
-Bar_EAD_Line_BC_Each_Year(EAD_Cost_Discounting)
+# Bar_EAD_Line_BC_Each_Year(EAD_Cost_Discounting)
 
+# This function shows the perceived EAD difference between Subsidized plan and self-relocation
+def Relative_EAD_Difference_Each_Year_Line(Benefit_cost, title):
+    x = Benefit_cost['Year']
+    x1 = np.arange(0, 51, 1)
+    Self_EAD = Benefit_cost['Self_EAD'].tolist()
+    Fixed_EAD = Benefit_cost['Moti_EAD'].tolist()
+    Optimal_EAD = Benefit_cost['Opt_Moti_EAD'].tolist()
+    Fixed_difference = [Self_EAD[i] - Fixed_EAD[i] for i in np.arange(0, 51, 1)]
+    # transform the unit to billions
+    Fixed_difference = [Fixed_difference[i] / 1e9 for i in np.arange(0, 51, 1)]
+
+    Optimal_difference = [Self_EAD[i] - Optimal_EAD[i] for i in np.arange(0, 51, 1)]
+    Optimal_difference = [Optimal_difference[i] / 1e9 for i in np.arange(0, 51, 1)]
+
+    # get the difference of self-relocation and fixed-relocation, as well as the difference between
+    fig, ax1 = plt.subplots(figsize=(8, 6))
+
+    ax1.plot(x1, Fixed_difference, linewidth=2, label="Fixed Subsidy", color='#004488')
+    ax1.plot(x1, Optimal_difference, linewidth=2, label='Optimal Subsidy', color='#994455')
+    ax1.set_ylabel('Yearly EAD Reduction (in billions)', fontsize=16)
+    # ax1.set_xlabel('Year')
+    ax1.set_xticks(x)
+    plt.xticks(x, rotation=300, fontsize=16)
+    plt.yticks(fontsize=16)
+    plt.xlabel('Year', fontsize=16)
+    tick_spacing = 5
+    ax1.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+    ax1.legend(bbox_to_anchor=(0.4, 1.0), loc='upper right', fontsize=14, handlelength=1)
+
+    plt.title(title, fontsize=20)
+    plt.ylim(0, 1.0)
+    plt.tight_layout()
+    plt.tick_params(axis='both',  # Apply to both x and y axes
+                    which='both',  # Apply to both major and minor ticks
+                    direction='in',  # 'in' for ticks pointing inwards
+                    bottom=True,  # Apply changes to the bottom axis
+                    top=False,  # Apply changes to the top axis
+                    left=True,  # Apply changes to the left axis
+                    right=False)
+
+    plt.show()
+
+
+# Relative_EAD_Difference_Each_Year_Line(EAD_Cost_Discounting, 'Higher Scenario')
+
+# This function visualizes the Absolute EAD difference
+def Absolute_EAD_Difference_Each_Year_Line(Benefit_cost, title):
+    x = Benefit_cost['Year']
+    x1 = np.arange(0, 51, 1)
+    Self_EAD = Benefit_cost['Original_EAD'].tolist()
+    Fixed_EAD = Benefit_cost['Moti_EAD'].tolist()
+    Optimal_EAD = Benefit_cost['Opt_Moti_EAD'].tolist()
+    Fixed_difference = [Self_EAD[i] - Fixed_EAD[i] for i in np.arange(0, 51, 1)]
+    Optimal_difference = [Self_EAD[i] - Optimal_EAD[i] for i in np.arange(0, 51, 1)]
+
+    # get the difference of self-relocation and fixed-relocation, as well as the difference between
+    fig, ax1 = plt.subplots()
+    ax1.plot(x1, Fixed_difference, linewidth=2, label="Fixed_Subsidy_Relo", color='#004488')
+    ax1.plot(x1, Optimal_difference, linewidth=2, label='Opt_Subsidy_Relo', color='#994455')
+    ax1.set_ylabel('EAD Difference - Subsidized VS No Relocation')
+    ax1.set_xlabel('Year')
+    ax1.set_xticks(x)
+    plt.xticks(x, rotation=300)
+    tick_spacing = 5
+    ax1.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+    ax1.legend(bbox_to_anchor=(0.5, 1.0), loc='upper right')
+
+    plt.title(title)
+    plt.ylim(1e9, 2.75e9)
+    plt.show()
+
+
+# Absolute_EAD_Difference_Each_Year_Line(EAD_Cost_Discounting, 'Government Perceived Absolute EAD Difference Every Year')
+
+def Accumulated_EAD_Reduction_Subsidy(Benefit_cost):
+    # x = Benefit_cost['Year']
+    x1 = np.arange(0, 21, 1)
+    Fixed_subsidy = Benefit_cost['Moti_Subsidy'].tolist()
+    Fixed_EAD_Reduction = Benefit_cost['EAD_Reduction_FS_SR'].tolist()
+    Optimal_subsidy = Benefit_cost['Opt_Moti_Subsidy'].tolist()
+    Optimal_EAD_Reduction = Benefit_cost['EAD_Reduction_OS_SR'].tolist()
+
+    Accumulated_Fix_Subsidy = [sum(Fixed_subsidy[i] for i in range(0, j)) for j in range(len(Fixed_subsidy))]
+    Accumulated_Fix_EADR = [sum(Fixed_EAD_Reduction[i] for i in range(0, j)) for j in range(len(Fixed_EAD_Reduction))]
+    Accumulated_Opt_Subsidy = [sum(Optimal_subsidy[i] for i in range(0, j)) for j in range(len(Optimal_subsidy))]
+    Accumulated_Opt_EADR = [sum(Optimal_EAD_Reduction[i] for i in range(0, j)) for j in
+                            range(len(Optimal_EAD_Reduction))]
+
+    # get the difference of self-relocation and fixed-relocation, as well as the difference between
+    fig, ax1 = plt.subplots()
+    ax1.plot(Accumulated_Fix_Subsidy, Accumulated_Fix_EADR, linewidth=2, label="Fixed_Subsidy_Relo", color='#004488')
+    ax1.plot(Accumulated_Opt_Subsidy, Accumulated_Opt_EADR, linewidth=2, label='Opt_Subsidy_Relo', color='#994455')
+    ax1.set_ylabel('Accumulated EAD Reduction')
+    ax1.set_xlabel('Accumulated Subsidy')
+
+    plt.title("Accumulated EAD Reduction VS Accumulated Subsidy")
+    plt.ylim(0, 1.6e10)
+    plt.legend()
+    plt.show()
+
+
+# Accumulated_EAD_Reduction_Subsidy(EAD_Cost_Discounting)
 
 def EAD_Reduction_Cost(Benefit_cost, calLength):
     x = np.arange(calLength)
@@ -220,7 +456,7 @@ def EAD_Reduction_Cost(Benefit_cost, calLength):
             color='#FA7F6F')
     ax1.set_ylabel('EAD Reduction Each Year')
     ax1.set_xlabel('Year')
-    ax1.set_ylim(0, 2e10)
+    ax1.set_ylim(0, 1.5e10)
     ax1.set_xticks(x)
     plt.xticks(x, rotation=300)
     tick_spacing = 5
@@ -231,7 +467,7 @@ def EAD_Reduction_Cost(Benefit_cost, calLength):
     ax2.bar(x + bar_width, list(Benefit_cost['Moti_TC'].values)[0:calLength], width=bar_width, label="Cost",
             color='#8ECFC9')
     ax2.set_ylabel('Cost Each Year')
-    ax2.set_ylim(0, 2e10)
+    ax2.set_ylim(0, 1.5e10)
     ax2.legend(bbox_to_anchor=(0.85, 0.9), loc='upper right')
 
     plt.title("EAD Reduction VS Relocation Cost for Fixed Subsidy")
@@ -242,7 +478,7 @@ def EAD_Reduction_Cost(Benefit_cost, calLength):
             color='#FA7F6F')
     ax3.set_ylabel('EAD Reduction Each Year')
     ax3.set_xlabel('Year')
-    ax3.set_ylim(0, 2e10)
+    ax3.set_ylim(0, 1.5e10)
     ax3.set_xticks(x)
     plt.xticks(x, rotation=300)
     tick_spacing = 5
@@ -253,14 +489,13 @@ def EAD_Reduction_Cost(Benefit_cost, calLength):
     ax4.bar(x + bar_width, list(Benefit_cost['Opt_Moti_TC'].values)[0:calLength], width=bar_width, label="Cost",
             color='#8ECFC9')
     ax4.set_ylabel('Cost Each Year')
-    ax4.set_ylim(0, 2e10)
+    ax4.set_ylim(0, 1.5e10)
     ax4.legend(bbox_to_anchor=(0.85, 0.9), loc='upper right')
     plt.title("EAD Reduction VS Relocation Cost for Optimal Subsidy")
     plt.show()
 
 
-EAD_Reduction_Cost(EAD_Cost_Discounting, 21)
-
+# EAD_Reduction_Cost(EAD_Cost_Discounting, 21)
 
 def Aggregated_EAD_Reduction_Cost(Benefit_cost, calLength):
     x = np.arange(0, calLength - 1, 5)
@@ -285,7 +520,7 @@ def Aggregated_EAD_Reduction_Cost(Benefit_cost, calLength):
     ax1.bar(x, fixed_ead_reduction, width=bar_width, label="EAD_Reduction", color='#FA7F6F')
     ax1.set_ylabel('EAD Reduction Every Five Years')
     ax1.set_xlabel('Year')
-    ax1.set_ylim(0, 2.5e10)
+    ax1.set_ylim(0, 1.5e10)
     ax1.set_xticks(x, ['0-4', '5-9', '10-14', '15-19'])
     plt.xticks(x)
     ax1.legend(bbox_to_anchor=(1.0, 1.0), loc='upper right')
@@ -293,7 +528,7 @@ def Aggregated_EAD_Reduction_Cost(Benefit_cost, calLength):
     ax2 = ax1.twinx()
     ax2.bar(x + bar_width, fixed_cost, width=bar_width, label="Cost", color='#8ECFC9')
     ax2.set_ylabel('Cost Every Five Years')
-    ax2.set_ylim(0, 2.5e10)
+    ax2.set_ylim(0, 1.5e10)
     ax2.legend(bbox_to_anchor=(0.85, 0.9), loc='upper right')
 
     plt.title("EAD Reduction VS Relocation Cost for Fixed Subsidy")
@@ -304,7 +539,7 @@ def Aggregated_EAD_Reduction_Cost(Benefit_cost, calLength):
             color='#FA7F6F')
     ax3.set_ylabel('EAD Reduction Every Five Years')
     ax3.set_xlabel('Year')
-    ax3.set_ylim(0, 2.5e10)
+    ax3.set_ylim(0, 1.5e10)
     ax3.set_xticks(x, ['0-4', '5-9', '10-14', '15-19'])
     plt.xticks(x)
     ax3.legend(bbox_to_anchor=(1.0, 1.0), loc='upper right')
@@ -313,14 +548,13 @@ def Aggregated_EAD_Reduction_Cost(Benefit_cost, calLength):
     ax4.bar(x + bar_width, optimal_cost, width=bar_width, label="Cost",
             color='#8ECFC9')
     ax4.set_ylabel('Cost Every Five Years')
-    ax4.set_ylim(0, 2.5e10)
+    ax4.set_ylim(0, 1.5e10)
     ax4.legend(bbox_to_anchor=(0.85, 0.9), loc='upper right')
     plt.title("EAD Reduction VS Relocation Cost for Optimal Subsidy")
     plt.show()
 
 
-Aggregated_EAD_Reduction_Cost(EAD_Cost_Discounting, 21)
-
+# Aggregated_EAD_Reduction_Cost(EAD_Cost_Discounting, 21)
 
 ## a function to represent the optimal subsidy amount as a percentage of the replacement cost
 def subsidy_percentage(Optimal_Residents):
@@ -329,11 +563,11 @@ def subsidy_percentage(Optimal_Residents):
     plt.title("Frequency of subsidy percentage")
     plt.xlabel("Subsidy amount/Replacement cost")
     plt.ylabel('Frequency')
+    plt.ylim(0, 3000)
     plt.show()
 
 
-subsidy_percentage(Optimal_Relocation_Residents)
-
+# subsidy_percentage(Optimal_Relocation_Residents)
 
 # a function to display the variable vs mhi_ratio; the variable that can be used include
 #         mhi_result[mhi]['Total_Relocation_Num'] = 0
@@ -448,4 +682,131 @@ def Relocation_year_Aggregate(mhi_result, colname, calLength):
     plt.legend()
     plt.show()
 
+
 # Relocation_year_Aggregate(mhi_result_self, 'Relocation_Year', 30)
+def EAD_Reduction_Calculation(row, subsidymode):
+    self_year = int(row['self_year'])
+    motivated_year = int(row[subsidymode])
+    if self_year < 21:
+        EAD_list = [row[f'ead_fwoa_year{i:02}'] for i in range(motivated_year, self_year + 1)]
+        EAD_Reduction = sum([EAD_list[i] / 1.03 ** (i + motivated_year) for i in range(len(EAD_list))])
+    else:
+        EAD_list = [row[f'ead_fwoa_year{i:02}'] for i in range(motivated_year, motivated_year + 31)]
+        EAD_Reduction = sum([EAD_list[i] / 1.03 ** (i + motivated_year) for i in range(len(EAD_list))])
+    return EAD_Reduction
+
+
+def Accumulated_EADReduction_Accumulated_Subsidy(Relocation_Outcome, EAD, gov_dr):
+    # For the Fixed Subsidy Plan
+    fixed_residents = Relocation_Outcome[Relocation_Outcome['fixed_flag'] == 1]
+    fixed_residents['discounted_fixed_subsidy'] = fixed_residents['fixed_subsidy'] / (1 + gov_dr) ** fixed_residents[
+        'fixed_year']
+    fixed_residents = fixed_residents.merge(EAD, on='structure_id', how='left')
+    fixed_residents['EAD_Reduction'] = fixed_residents.apply(EAD_Reduction_Calculation, axis=1,
+                                                             subsidymode='fixed_year')
+
+    fixed_discounted_subsidy = np.array(fixed_residents['discounted_fixed_subsidy'].tolist())
+    EAD_reduction_fixed = np.array(fixed_residents['EAD_Reduction'].tolist())
+    accumulated_fixed_subsidy = fixed_discounted_subsidy.cumsum()
+    accumulated_fixed_ead_reduction = EAD_reduction_fixed.cumsum()
+    plt.plot(accumulated_fixed_subsidy, accumulated_fixed_ead_reduction)
+    # plt.show()
+    # print(fixed_discounted_subsidy[0:10])
+    # print(EAD_reduction_fixed[0:10])
+
+    # For the Optimal Subsidy Plan
+    optimal_residents = Relocation_Outcome[Relocation_Outcome['optimal_flag'] == 1]
+    optimal_residents['discounted_optimal_subsidy'] = optimal_residents['optimal_subsidy'] / (1 + gov_dr) ** \
+                                                      optimal_residents['optimal_year']
+    optimal_residents = optimal_residents.merge(EAD, on='structure_id', how='left')
+    optimal_residents['EAD_Reduction'] = optimal_residents.apply(EAD_Reduction_Calculation, axis=1,
+                                                                 subsidymode='optimal_year')
+
+    optimal_discounted_subsidy = np.array(optimal_residents['discounted_optimal_subsidy'].tolist())
+    EAD_reduction_optimal = np.array(optimal_residents['EAD_Reduction'].tolist())
+
+    accumulated_optimal_subsidy = optimal_discounted_subsidy.cumsum()
+    accumulated_optimal_ead_reduction = EAD_reduction_optimal.cumsum()
+    plt.plot(accumulated_optimal_subsidy, accumulated_optimal_ead_reduction)
+    plt.show()
+    # print(optimal_discounted_subsidy[0:10])
+    # print(EAD_reduction_optimal[0:10])
+
+
+# EAD = pd.read_csv('landscape8_fragility1.0_pumping0.5.csv')
+#     # For the Optimal Subsidy Plan
+# Accumulated_EADReduction_Accumulated_Subsidy(Relocation_Outcome, EAD, 0.03)
+
+def Accumulated_BCR_Accumulated_Cost(Relocation_Outcome_Data, EAD, gov_dr, title, cutoff_value):
+    Relocation_Outcome = Relocation_Outcome_Data
+    # For the Fixed Subsidy Plan
+    fixed_residents = Relocation_Outcome[Relocation_Outcome['fixed_flag'] == 1]
+    fixed_residents['discounted_fixed_subsidy'] = fixed_residents['fixed_subsidy'] / (1 + gov_dr) ** fixed_residents[
+        'fixed_year']
+    fixed_residents = fixed_residents.merge(EAD, on='structure_id', how='left')
+    fixed_residents['EAD_Reduction'] = fixed_residents.apply(EAD_Reduction_Calculation, axis=1,
+                                                             subsidymode='fixed_year')
+
+    fixed_residents['BCR_Fix'] = fixed_residents['EAD_Reduction'] / fixed_residents['discounted_fixed_subsidy']
+
+    # fixed_residents = fixed_residents[fixed_residents['BCR_Fix'] <= cutoff_value]
+    fixed_residents = fixed_residents.sort_values(by='BCR_Fix', ascending=False)
+
+    # sort files by 'Subsidy' and 'EAD_Reduction'
+    # fixed_residents = fixed_residents.sort_values(by = ['discounted_fixed_subsidy', 'EAD_Reduction'], ascending = [True, False])
+
+    fixed_discounted_subsidy = np.array(fixed_residents['discounted_fixed_subsidy'].tolist())
+    EAD_reduction_fixed = np.array(fixed_residents['EAD_Reduction'].tolist())
+    accumulated_fixed_subsidy = fixed_discounted_subsidy.cumsum() / 1e6
+    accumulated_fixed_ead_reduction = EAD_reduction_fixed.cumsum() / 1e6
+    BCR_fixed = accumulated_fixed_ead_reduction / accumulated_fixed_subsidy
+
+    fig, ax1 = plt.subplots(figsize=(8, 6))
+    ax1.plot(accumulated_fixed_subsidy, BCR_fixed, color=colors['darkblue'], label='Fixed')
+    # plt.show()
+    # print(fixed_discounted_subsidy[0:10])
+    # print(EAD_reduction_fixed[0:10])
+
+    # For the Optimal Subsidy Plan
+    optimal_residents = Relocation_Outcome[Relocation_Outcome['optimal_flag'] == 1]
+    optimal_residents['discounted_optimal_subsidy'] = optimal_residents['optimal_subsidy'] / (1 + gov_dr) ** \
+                                                      optimal_residents['optimal_year']
+    optimal_residents = optimal_residents.merge(EAD, on='structure_id', how='left')
+    optimal_residents['EAD_Reduction'] = optimal_residents.apply(EAD_Reduction_Calculation, axis=1,
+                                                                 subsidymode='optimal_year')
+    optimal_residents['BCR_Opt'] = optimal_residents['EAD_Reduction'] / optimal_residents['discounted_optimal_subsidy']
+    # optimal_residents = optimal_residents[optimal_residents['BCR_Opt'] <= cutoff_value]
+    optimal_residents = optimal_residents.sort_values(by='BCR_Opt', ascending=False)
+
+    # sort files by 'Subsidy' and 'EAD_Reduction'
+    # optimal_residents = optimal_residents.sort_values(by=['discounted_optimal_subsidy', 'EAD_Reduction'],
+    #                                               ascending=[True, False])
+
+    optimal_discounted_subsidy = np.array(optimal_residents['discounted_optimal_subsidy'].tolist())
+    EAD_reduction_optimal = np.array(optimal_residents['EAD_Reduction'].tolist())
+
+    accumulated_optimal_subsidy = optimal_discounted_subsidy.cumsum() / 1e6
+    accumulated_optimal_ead_reduction = EAD_reduction_optimal.cumsum() / 1e6
+    BCR_optimal = accumulated_optimal_ead_reduction / accumulated_optimal_subsidy
+    ax1.plot(accumulated_optimal_subsidy, BCR_optimal, color=colors['darkred'], label='Optimal')
+
+    # plt.ylim(1.0, 3.5)
+    plt.xlim(left=0, right=1000)
+    plt.ylim(0, cutoff_value)
+    plt.ylabel('Cumulative BCR', fontsize=16)
+    plt.xlabel('Cumulative Subsidy, in millions', fontsize=16)
+    plt.title(title, fontsize=20)
+    plt.legend(fontsize=14, handlelength=1)
+    plt.tick_params(axis='both',  # Apply to both x and y axes
+                    which='both',  # Apply to both major and minor ticks
+                    direction='in',  # 'in' for ticks pointing inwards
+                    bottom=True,  # Apply changes to the bottom axis
+                    top=False,  # Apply changes to the top axis
+                    left=True,  # Apply changes to the left axis
+                    right=False)
+    plt.show()
+    # print(optimal_discounted_subsidy[0:10])
+    # print(EAD_reduction_optimal[0:10])
+# EAD_filename = './EAD_Data/landscape' + str(landscape) + '_fragility1.0_pumping0.5.csv'
+# EAD = pd.read_csv(EAD_filename)
+# Accumulated_BCR_Accumulated_Cost(Relocation_Outcome, EAD, 0.03, 'Lower Scenario', 50)
