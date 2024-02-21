@@ -187,11 +187,11 @@ def Cumulative_Relocation_In_One_Figure(Fixed_Self, Fixed_Motivated, Optimal_Sel
     plt.plot(x, opt_motivated_relocation, label=label4, color=colors[color4], marker='o')
 
     # Labeling, Legend etc.
-    plt.xlabel('Year', fontsize=16)
-    plt.ylabel('Cumulative Relocations', fontsize=16)
-    plt.title(title, fontsize=20)
-    plt.xticks([h for h in x], fontsize=16)  # Center the x-ticks between the two bars
-    plt.yticks(fontsize=16)
+    plt.xlabel('Year', fontsize=24)
+    plt.ylabel('Cumulative Relocations', fontsize=24)
+    plt.title(title, fontsize=30)
+    plt.xticks([h for h in x], fontsize=18)  # Center the x-ticks between the two bars
+    plt.yticks(fontsize=18)
     plt.legend(loc='upper left', fontsize=14, handlelength=1)
 
     plt.tick_params(axis='both',  # Apply to both x and y axes
@@ -212,7 +212,7 @@ def Cumulative_Relocation_In_One_Figure(Fixed_Self, Fixed_Motivated, Optimal_Sel
 
 # Cumulative_Relocation_In_One_Figure(Fixed_Self, Fixed_Motivated, Optimal_Self, Optimal_Motivated,yearlist,
 #                                     "Self Relocations | Fixed Subsidy", "Total Relocations | Fixed Subsidy", "Self Relocations | Optimal Subsidy",
-#                                     "Total Relocations | Optimal Subsidy",'lightblue', 'darkblue','lightred', 'darkred', 'Lower Scenario')
+#                                     "Total Relocations | Optimal Subsidy",'lightblue', 'darkblue','lightred', 'darkred', 'Higher Scenario')
 
 # A function to plot the stack line chart of the adoption rate
 def Line_adoption(Adoption, calLength):
@@ -363,17 +363,17 @@ def Relative_EAD_Difference_Each_Year_Line(Benefit_cost, title):
 
     ax1.plot(x1, Fixed_difference, linewidth=2, label="Fixed Subsidy", color='#004488')
     ax1.plot(x1, Optimal_difference, linewidth=2, label='Optimal Subsidy', color='#994455')
-    ax1.set_ylabel('Yearly EAD Reduction (in billions)', fontsize=16)
+    ax1.set_ylabel('Yearly EAD Reduction (in billions)', fontsize=24)
     # ax1.set_xlabel('Year')
     ax1.set_xticks(x)
-    plt.xticks(x, rotation=300, fontsize=16)
-    plt.yticks(fontsize=16)
-    plt.xlabel('Year', fontsize=16)
+    plt.xticks(x, rotation=300, fontsize=18)
+    plt.yticks(fontsize=18)
+    plt.xlabel('Year', fontsize=24)
     tick_spacing = 5
     ax1.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
-    ax1.legend(bbox_to_anchor=(0.4, 1.0), loc='upper right', fontsize=14, handlelength=1)
+    ax1.legend(bbox_to_anchor=(0.5, 1.0), loc='upper right', fontsize=18, handlelength=1)
 
-    plt.title(title, fontsize=20)
+    plt.title(title, fontsize=30)
     plt.ylim(0, 1.0)
     plt.tight_layout()
     plt.tick_params(axis='both',  # Apply to both x and y axes
@@ -387,7 +387,7 @@ def Relative_EAD_Difference_Each_Year_Line(Benefit_cost, title):
     plt.show()
 
 
-# Relative_EAD_Difference_Each_Year_Line(EAD_Cost_Discounting, 'Higher Scenario')
+# Relative_EAD_Difference_Each_Year_Line(EAD_Cost_Discounting, 'Lower Scenario')
 
 # This function visualizes the Absolute EAD difference
 def Absolute_EAD_Difference_Each_Year_Line(Benefit_cost, title):
@@ -762,7 +762,7 @@ def Accumulated_BCR_Accumulated_Cost(Relocation_Outcome_Data, EAD, gov_dr, title
     BCR_fixed = accumulated_fixed_ead_reduction / accumulated_fixed_subsidy
 
     fig, ax1 = plt.subplots(figsize=(8, 6))
-    ax1.plot(accumulated_fixed_subsidy, BCR_fixed, color=colors['darkblue'], label='Fixed')
+    ax1.plot(accumulated_fixed_subsidy, BCR_fixed, color=colors['darkblue'], label='Fixed Subsidy')
     # plt.show()
     # print(fixed_discounted_subsidy[0:10])
     # print(EAD_reduction_fixed[0:10])
@@ -788,25 +788,28 @@ def Accumulated_BCR_Accumulated_Cost(Relocation_Outcome_Data, EAD, gov_dr, title
     accumulated_optimal_subsidy = optimal_discounted_subsidy.cumsum() / 1e6
     accumulated_optimal_ead_reduction = EAD_reduction_optimal.cumsum() / 1e6
     BCR_optimal = accumulated_optimal_ead_reduction / accumulated_optimal_subsidy
-    ax1.plot(accumulated_optimal_subsidy, BCR_optimal, color=colors['darkred'], label='Optimal')
+    ax1.plot(accumulated_optimal_subsidy, BCR_optimal, color=colors['darkred'], label='Optimal Subsidy')
 
     # plt.ylim(1.0, 3.5)
     plt.xlim(left=0, right=1000)
     plt.ylim(0, cutoff_value)
-    plt.ylabel('Cumulative BCR', fontsize=16)
-    plt.xlabel('Cumulative Subsidy, in millions', fontsize=16)
-    plt.title(title, fontsize=20)
-    plt.legend(fontsize=14, handlelength=1)
+    plt.ylabel('Cumulative BCR', fontsize=24)
+    plt.xlabel('Cumulative Subsidy, in millions', fontsize=24)
+    plt.title(title, fontsize=30)
+    plt.legend(fontsize=18, handlelength=1)
     plt.tick_params(axis='both',  # Apply to both x and y axes
                     which='both',  # Apply to both major and minor ticks
                     direction='in',  # 'in' for ticks pointing inwards
                     bottom=True,  # Apply changes to the bottom axis
                     top=False,  # Apply changes to the top axis
                     left=True,  # Apply changes to the left axis
-                    right=False)
+                    right=False,
+                    labelsize=18)
     plt.show()
     # print(optimal_discounted_subsidy[0:10])
     # print(EAD_reduction_optimal[0:10])
-# EAD_filename = './EAD_Data/landscape' + str(landscape) + '_fragility1.0_pumping0.5.csv'
-# EAD = pd.read_csv(EAD_filename)
-# Accumulated_BCR_Accumulated_Cost(Relocation_Outcome, EAD, 0.03, 'Lower Scenario', 50)
+
+
+EAD_filename = './EAD_Data/landscape' + str(landscape) + '_fragility1.0_pumping0.5.csv'
+EAD = pd.read_csv(EAD_filename)
+Accumulated_BCR_Accumulated_Cost(Relocation_Outcome, EAD, 0.03, 'Lower Scenario', 50)

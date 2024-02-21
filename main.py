@@ -17,7 +17,6 @@ if __name__ == '__main__':
     ## Data input
     #cost_replacement_relocation.csv is a file generated based on Dr. Johnson's code, it has three columns: structure_id, replacement cost, and relocation cost(calculated according to Master Plan File - F1)
     resident_info_copy = pd.read_csv("cost_replacement_relocation.csv")
-    resident_info_copy.drop_duplicates(keep='first', inplace=True)
 
     # # EAD_g500_interpolated.csv contains the EAD data for each structure
     # ead_info = pd.read_csv('EAD_g500_interpolated.csv')
