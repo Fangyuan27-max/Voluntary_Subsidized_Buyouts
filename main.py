@@ -57,7 +57,7 @@ if __name__ == '__main__':
         resInflaRate = 0.02
 
         calLength = 21
-        decLength = 31
+        decLength = 30
         totalLength = 51
 
         # Instantiate residents and choose the near-optimal subsidy percentage
@@ -110,23 +110,23 @@ if __name__ == '__main__':
         Relocation_outcome.to_csv(Relocation_outcome_name, index = False)
 
 
-        mode1 = 'Opt'
-        mhi_list = [0.5, 0.85, 1.25, 2, 999]
-        mhi_result = analysis_mhi(Gov, resList, mhi_list, mode1, subPercent, calLength)
-        mhi_result_opt_name = folder_path + 'mhi_result_opt_' + str(landscape) + "_gov3_res12.csv"
-        mhi_result.to_csv(mhi_result_opt_name)
-
-        mode2 = 'Fix'
-        mhi_list = [0.5, 0.85, 1.25, 2, 999]
-        mhi_result = analysis_mhi(Gov, resList, mhi_list, mode2, subPercent, calLength)
-        mhi_result_fix_name = folder_path + 'mhi_result_fix_' + str(landscape) + "_gov3_res12.csv"
-        mhi_result.to_csv(mhi_result_fix_name)
-
-        mode3 = 'Self'
-        mhi_list = [0.5, 0.85, 1.25, 2, 999]
-        mhi_result = analysis_mhi(Gov, resList, mhi_list, mode3, subPercent, calLength)
-        mhi_result_self_name = folder_path + 'mhi_result_self_' + str(landscape) + "_gov3_res12.csv"
-        mhi_result.to_csv(mhi_result_self_name)
+        # mode1 = 'Opt'
+        # mhi_list = [0.5, 0.85, 1.25, 2, 999]
+        # mhi_result = analysis_mhi(Gov, resList, mhi_list, mode1, subPercent, calLength)
+        # mhi_result_opt_name = folder_path + 'mhi_result_opt_' + str(landscape) + "_gov3_res12.csv"
+        # mhi_result.to_csv(mhi_result_opt_name)
+        #
+        # mode2 = 'Fix'
+        # mhi_list = [0.5, 0.85, 1.25, 2, 999]
+        # mhi_result = analysis_mhi(Gov, resList, mhi_list, mode2, subPercent, calLength)
+        # mhi_result_fix_name = folder_path + 'mhi_result_fix_' + str(landscape) + "_gov3_res12.csv"
+        # mhi_result.to_csv(mhi_result_fix_name)
+        #
+        # mode3 = 'Self'
+        # mhi_list = [0.5, 0.85, 1.25, 2, 999]
+        # mhi_result = analysis_mhi(Gov, resList, mhi_list, mode3, subPercent, calLength)
+        # mhi_result_self_name = folder_path + 'mhi_result_self_' + str(landscape) + "_gov3_res12.csv"
+        # mhi_result.to_csv(mhi_result_self_name)
 
 
 

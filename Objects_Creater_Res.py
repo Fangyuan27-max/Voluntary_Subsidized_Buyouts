@@ -34,4 +34,3 @@ def CreateRes(resident_info, ead_info, colname, startcol,  disMethod, disRate, a
 
 
 
-
